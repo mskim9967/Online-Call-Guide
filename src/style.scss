@@ -1,9 +1,10 @@
 $pink : #ffedf0, #ffd2d7, #f4a2a3, #ed7e7f, #f9615e, #fe5245, #f14b45, #de413e;
 
-$gray: #f7f7f7, #e5e5e5, #d4d4d4, #b0b0b0, #8f8f8f, #686868, #545454, #363636;
+$gray: #fbfbfb, #e5e5e5, #d4d4d4, #b0b0b0, #8f8f8f, #686868, #545454, #363636;
 
-$timeMid : .3s;
-$timeShort : .1s;
+$timeC : .4s;
+$timeB : .2s;
+$timeA : .1s;
 .nav {
 	z-index: 10;
 	position: fixed;
@@ -14,7 +15,7 @@ $timeShort : .1s;
 	.menu {
 		display: grid;
 		grid-template-columns: 2fr 2fr 2fr 2fr;
-		transition: transform $timeMid;
+		transition: transform $timeC;
 		
 		.tab {
 			position:relative;
@@ -34,7 +35,7 @@ $timeShort : .1s;
 			box-shadow: 0px -7px 8px -4px #bfbfbf, inset 0 0 20px 0px nth($gray,1);
 
 			transform: translateY(16px);
-			transition: transform $timeShort;
+			transition: transform $timeA;
 
 			.label {
 				position:relative;
@@ -44,7 +45,7 @@ $timeShort : .1s;
 		}
 		.tab.active {
 			transform: translateY(9px);
-			transition: transform $timeShort;
+			transition: transform $timeA;
 		}
 
 		.music{
@@ -60,9 +61,9 @@ $timeShort : .1s;
 			grid-column: 4 / span 1;
 		}
 	}
-	.menu.unActive {
+	.menu.inactive {
 		transform: translateY(80px);
-		transition: transform $timeMid;
+		transition: transform $timeC;
 	}
 	
 	.player {
@@ -75,8 +76,13 @@ $timeShort : .1s;
 			border-radius: 50%;
 			background: red;
 			left: 50%;
-			bottom: 0px;
-			transition: transform $timeMid, left $timeMid, bottom $timeMid;
+			bottom: 10px;
+			transition: transform $timeC, left $timeC, bottom $timeC;
+			overflow: hidden;
+			img{
+				max-width: 100%;
+				max-height: auto;
+			}
 		}
 		.lyricPage {
 			position: fixed;
@@ -89,8 +95,8 @@ $timeShort : .1s;
 			
 			opacity: 0;
 			max-height: 0px;
-			transform: translateY(120px);
-			transition: opacity $timeMid, transform $timeMid, max-height 0s $timeMid;
+			transform: translateY(200px);
+			transition: opacity $timeC, transform $timeC, max-height 0s $timeC;
 		}
 	}
 	.player.active {
@@ -99,13 +105,13 @@ $timeShort : .1s;
 			left: calc(5vw);
 			bottom: 3%;
 			transform: scale(0.4);
-			transition: transform $timeMid, left $timeMid, bottom $timeMid;
+			transition: transform $timeC, left $timeC, bottom $timeC;
 		}
 		.lyricPage {
 			opacity: 1;
 			max-height: 999px;
 			transform: translateY(0px);
-			transition: opacity $timeMid, transform $timeMid, max-height 0s;
+			transition: opacity $timeC, transform $timeC, max-height 0s;
 
 		}
 	}	
@@ -143,6 +149,7 @@ $timeShort : .1s;
 		font-weight: 500;
 		color: nth($gray,8);
 		vertical-align: middle;
+		white-space:nowrap;
 	}
 }
 
@@ -150,25 +157,42 @@ $timeShort : .1s;
 	width:100%;
 	height:100%;
 	background: nth($gray,1);
+	min-height:100vh;
+	padding: 20px 20px 110px 20px;
 	
+	.page.active {
+		display: block;
+		animation: fadeIn $timeC;
+	}
 	.page {
+		display: none;
+		
 		.songCardList {
 			padding: 0 3px 0 3px;
 			width:100%;
 			
+			.songCard.swiped {
+				transform: translateX(-70px);
+				transition: transform $timeC;
+			}
+	
+			.songCard.swiped:active{
+				transform: translateX(-70px) scale(0.95);
+				transition: transform $timeA;
+			}
 			.songCard:active{
-				transform: scale(0.95);
-				transition: transform $timeShort;
+				transform: translateX(0%) scale(0.95);
+				transition: transform $timeA;
 			}
 
 			.songCard.pid1{
 				background: #fff7f7;
 			}
 			.songCard.pid2{
-				background: #f8f7ff;
+				background: #e6efff;
 			}
 			.songCard.pid3{
-				background: #fffffa;
+				background: #ffffeb;
 			}
 			.songCard.pid4{
 				background: #f7fffa;
@@ -178,12 +202,12 @@ $timeShort : .1s;
 			}
 			.songCard {
 				transform: scale(1.00);
-				transition: transform $timeMid;
+				transition: transform $timeC;
 				
 				$songCardHeight: 80px;
 				
 				width:100%;
-				height: $songCardHeight;
+				// height: $songCardHeight;
 				border-radius: 12px;
 
 				padding: 7px 11px;
@@ -193,7 +217,7 @@ $timeShort : .1s;
 
 				display: grid;
 				grid-template-columns: 1fr 3.5fr;
-				grid-template-rows: 1.4fr 1fr;
+				grid-template-rows: calc(#{$songCardHeight}*0.5) auto;
 				column-gap: 10px;
 				
 				.coverImgArea {
@@ -231,23 +255,21 @@ $timeShort : .1s;
 				.tagsArea {
 					display: flex;
 					align-items: center;
+					flex-wrap : wrap;
 					gap: 4px;
 
 					grid-column: 2 / span 1;
 					grid-row: 2 / span 1;
+					
+					-ms-overflow-style: none; /* IE and Edge */
+    			scrollbar-width: none; /* Firefox */
+				}
+				.tagsArea::-webkit-scrollbar {
+    			display: none; /* Chrome, Safari, Opera*/
 				}
 			}
 		}
-		display: none;
-		padding: 20px 20px 110px 20px;
 	}
-	.page.active {
-		display: block;
-		opacity: 100%;
-		animation: fadeIn $timeMid;
-	}
-	
-	
 }
 
 
@@ -260,7 +282,7 @@ $timeShort : .1s;
 	bottom: 0;
 	left: 0;
 	background-color: #000000;
-	transition: opacity $timeMid, max-height 0s $timeMid;
+	transition: opacity $timeC, max-height 0s $timeC;
 
 	max-height: 0px;
 }
@@ -274,7 +296,7 @@ $timeShort : .1s;
 	height: 94%;
 	background: #ffffff;
 	transform: translateY(20%);
-	transition: opacity $timeMid, transform $timeMid, max-height 0s $timeMid;
+	transition: opacity $timeC, transform $timeC, max-height 0s $timeC;
 
 	max-height: 0px;
 }
@@ -282,14 +304,14 @@ $timeShort : .1s;
 	.modalBg {
 		display: relative;
 		opacity:60%;
-		transition: opacity $timeMid, max-height 0s;
+		transition: opacity $timeC, max-height 0s;
 
 		max-height: 999px;
 	}
 	.lyricModal {
 		opacity:100%;
 		transform: translateY(0%);
-		transition: opacity $timeMid, transform $timeMid, max-height 0s;
+		transition: opacity $timeC, transform $timeC, max-height 0s;
 
 		max-height: 999px;
 	}
