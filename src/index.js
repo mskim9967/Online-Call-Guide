@@ -17,12 +17,12 @@ const theme = createMuiTheme({
   },
 });
 
-let playerDefault = {isActive:false, song:null};
+let playerDefault = {isActive:false, song:null, tagData: null};
 function playerReducer(state = playerDefault, action) {
     if(action.type === 'active') {
         let cp = JSON.parse(JSON.stringify(state));
 				cp.isActive=true;
-        return cp;
+				return cp;
     } 
 		else if(action.type === 'inactive') {
         let cp = JSON.parse(JSON.stringify(state));
@@ -32,7 +32,8 @@ function playerReducer(state = playerDefault, action) {
 		else if(action.type === 'songCardClicked') {
         let cp = JSON.parse(JSON.stringify(state));
 				cp.isActive=true;
-				cp.song = action.payload;
+				cp.song = action.payload.song;
+				cp.tagData = action.payload.tagData;
         return cp;
     }
     return state;
@@ -43,9 +44,16 @@ function langReducer(state = 'kr', action) {
   return state;
 }
 
+function pageReducer(state = 1, action) {
+    if(action.type === 'changePage') {
+      return action.payload;
+    } 
+    return state;
+}
 
 
-let store = createStore(combineReducers({playerReducer, langReducer}));
+
+let store = createStore(combineReducers({playerReducer, langReducer, pageReducer}));
 
 ReactDOM.render(
   <React.StrictMode>

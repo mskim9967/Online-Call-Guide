@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux'
-import { useParams, Route } from 'react-router-dom';
+import { useParams, Route,useHistory, useLocation, Link } from 'react-router-dom';
 
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
-import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
+import QueueMusicIcon from '@material-ui/icons/QueueMusic';
 import SearchIcon from '@material-ui/icons/Search';
 import SettingsIcon from '@material-ui/icons/Settings';
 
@@ -12,12 +12,15 @@ import Player from './Player.js';
 
 function Nav(props) {
 	const { lang } = useParams();
+	const history = useHistory();
+	const location = useLocation();
 	
 	return (
 		<div className="nav">
 			<div className={'menu '+ (props.playerReducer.isActive ? "inactive": "")}>
-				<div className={"tab music " + (props.nowTab == 1 ? "active" : "")} onClick={()=>{
-					props.setNowTab(1);
+				<div className={"tab music " + (props.nowPage === 1 ? "active" : "")} onClick={()=>{
+					if(props.nowTab != 1) history.push(`/${lang}/songs`);
+					props.dispatch({type:'changePage', payload:1});
 				}}>
 					<MusicNoteIcon style={{fontSize: 35, color:"#fe5245"}}></MusicNoteIcon>
 					<p className="label">{
@@ -28,10 +31,13 @@ function Nav(props) {
 						}[lang]
 					}</p>
 				</div>
-				<div className={"tab playlist " + (props.nowTab == 2 ? "active" : "")} onClick={()=>{
-					props.setNowTab(2);
+
+
+				<div className={"tab playlist " + (props.nowPage === 2 ? "active" : "")} onClick={()=>{
+					if(props.nowTab != 2) history.push(`/${lang}/playlist`);
+					props.dispatch({type:'changePage', payload:2});
 				}}>
-					<PlaylistPlayIcon style={{fontSize: 35, color:"#fe5245"}}></PlaylistPlayIcon>
+					<QueueMusicIcon style={{fontSize: 35, color:"#fe5245"}}></QueueMusicIcon>
 					<p className="label">{
 						{
 							kr: '리스트',
@@ -40,8 +46,10 @@ function Nav(props) {
 						}[lang]
 					}</p>
 				</div>
-				<div className={"tab search " + (props.nowTab == 3 ? "active" : "")} onClick={()=>{
-					props.setNowTab(3);
+
+				<div className={"tab search " + (props.nowPage === 3 ? "active" : "")} onClick={()=>{
+					if(props.nowTab != 3) history.push(`/${lang}/search`);
+					props.dispatch({type:'changePage', payload:3});
 				}}>
 					<SearchIcon style={{fontSize: 35, color:"#fe5245"}}></SearchIcon>
 					<p className="label">{
@@ -52,8 +60,11 @@ function Nav(props) {
 						}[lang]
 					}</p>
 				</div>
-				<div className={"tab setting " + (props.nowTab == 4 ? "active" : "")} onClick={()=>{
-					props.setNowTab(4);
+
+
+				<div className={"tab setting " + (props.nowPage === 4 ? "active" : "")} onClick={()=>{
+					if(props.nowTab != 4) history.push(`/${lang}/setting`);
+					props.dispatch({type:'changePage', payload:4});
 				}}>
 					<SettingsIcon style={{fontSize: 35, color:"#fe5245"}}></SettingsIcon>
 					<p className="label">{
@@ -74,7 +85,9 @@ function Nav(props) {
 
 function stateToProps(state) {
     return {
-        playerReducer : state.playerReducer
+        playerReducer : state.playerReducer,
+				lang: state.langReducer,
+				nowPage: state.pageReducer
     }
 }
 

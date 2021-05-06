@@ -13,8 +13,8 @@ box-sizing: border-box; /* 오페라(Opera) */
 
 -webkit-box-sizing: border-box; /* 웹킷(Webkit) & 크롬(Chrome) */
 
+	//overscroll-behavior: contain;
 }
-
 
 
 
@@ -26,6 +26,7 @@ padding: 0;
 	-moz-osx-font-smoothing: grayscale;
 	width:100vw;
 	font-size: 15px;
+
 }
 
 code {
@@ -36,3 +37,5 @@ code {
 p {
 	margin: 0;
 }
+
+/* input::-ms-clear, input::-ms-reveal{ 	display:none;width:0;height:0; } input::-webkit-search-decoration, input::-webkit-search-cancel-button, input::-webkit-search-results-button, input::-webkit-search-results-decoration{ 	display:none; } */

@@ -6,41 +6,78 @@ var connection = dbConn.init();
 
 dbConn.ocg_open(connection);
 
-router.get('/song_idol_cv', (req, res) => {
-	var sql = 'SELECT * FROM SONG_IDOL INNER JOIN CV ON SONG_IDOL.idol_id=CV.idol_id INNER JOIN IDOL ON SONG_IDOL.idol_id=IDOL.idol_id WHERE song_id=' + req.query.song_id;
+router.get('/song_idol_cv/search', (req, res) => {
+	var sql = 'SELECT * FROM SONG_IDOL NATURAL JOIN CV NATURAL JOIN IDOL NATURAL JOIN SONG';
+	
+	if(Object.keys(req.query).length !== 0) {
+		sql += ' WHERE';
+		for(key in req.query)
+		sql += ` ${key} LIKE '%${req.query[key]}%' OR`;
+		sql = sql.slice(0, -2);
+	}
 	connection.query(sql, function (error, rows, fields) {
     if (error) {
     	console.log('error : ' + error);
     } 
 		else {
 			res.json({rows: rows});  
-    }
+    } 
   });
 });
 
-router.get('/song_unit', (req, res) => {
-	var sql = 'SELECT * FROM SONG_UNIT INNER JOIN UNIT ON SONG_UNIT.unit_id=UNIT.unit_id WHERE song_id=' + req.query.song_id;
+router.get('/song_unit_idol_cv/search', (req, res) => {
+	var sql = 'SELECT * FROM SONG_UNIT NATURAL JOIN SONG NATURAL JOIN UNIT NATURAL JOIN UNIT_IDOL NATURAL JOIN IDOL NATURAL JOIN CV';
+	
+	if(Object.keys(req.query).length !== 0) {
+		sql += ' WHERE';
+		for(key in req.query)
+		sql += ` ${key} LIKE '%${req.query[key]}%' OR`;
+		sql = sql.slice(0, -2);
+	}
 	connection.query(sql, function (error, rows, fields) {
     if (error) {
     	console.log('error : ' + error);
     } 
 		else {
-			res.json({row: rows[0]});  
-    }
+			res.json({rows: rows});  
+    } 
   });
 });
 
 
-
-router.get('/:table', (req, res) => {
-	var sql = 'SELECT * FROM ' + req.params.table.toUpperCase();
+router.get('/song_idol_cv', (req, res) => {
+	var sql = 'SELECT * FROM SONG_IDOL NATURAL JOIN CV NATURAL JOIN IDOL NATURAL JOIN SONG';
+	
 	if(Object.keys(req.query).length !== 0) {
 		sql += ' WHERE';
 		for(key in req.query)
 			sql += ' ' + key + '=' + req.query[key] + ' AND';
 		sql = sql.slice(0, -3);
 	}
+	connection.query(sql, function (error, rows, fields) {
+    if (error) {
+    	console.log('error : ' + error);
+    } 
+		else {
+			res.json({rows: rows});  
+    } 
+  });
+});
 
+router.get('/:table/search', (req, res) => {
+	var div = req.params.table.indexOf('_');
+	if(div >= 0) 
+		var sql = `SELECT * FROM ${req.params.table.substring(0, div).toUpperCase()} NATURAL JOIN ${req.params.table.substring(div + 1, req.params.table.length).toUpperCase()}`;
+	else 
+		var sql = 'SELECT * FROM ' + req.params.table.toUpperCase();
+		
+	if(Object.keys(req.query).length !== 0) {
+		sql += ' WHERE';
+		for(key in req.query)
+		sql += ` ${key} LIKE '%${req.query[key]}%' OR`;
+		sql = sql.slice(0, -2);
+	}
+	
 	connection.query(sql, function (error, rows, fields) {
 		if (error) {
 			console.log('error : ' + error);
@@ -51,9 +88,33 @@ router.get('/:table', (req, res) => {
 	});
 });
 
+router.get('/:table', (req, res) => {
+	var div = req.params.table.indexOf('_');
+	if(div >= 0)  
+		var sql = `SELECT * FROM ${req.params.table.toUpperCase()} NATURAL JOIN ${req.params.table.substring(0, div).toUpperCase()} NATURAL JOIN ${req.params.table.substring(div + 1, req.params.table.length).toUpperCase()}`;
+	else 
+		var sql = 'SELECT * FROM ' + req.params.table.toUpperCase();
+	
+	if(Object.keys(req.query).length !== 0) {
+		sql += ' WHERE';
+		for(key in req.query)
+			sql += ' ' + key + '=' + req.query[key] + ' AND';
+		sql = sql.slice(0, -3);
+	}
+	
+	connection.query(sql, function (error, rows, fields) {
+		if (error) {
+			console.log('error : ' + error);
+		} 
+		else {
+			res.json({rows: rows});
+		}
+	});
+});
+
+
 router.get('/img/:table/:id', (req, res) => {
-	if(req.params.id !== false)
-		res.sendFile(req.params.id+'.webp', { root: __dirname+'/../img/'+req.params.table});
+	if(req.params.id !== 'undefined')	res.sendFile(req.params.id+'.webp', { root: __dirname+'/../img/'+req.params.table});
 });
 
 

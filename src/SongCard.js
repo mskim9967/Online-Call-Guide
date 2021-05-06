@@ -6,54 +6,64 @@ import { useSwipeable } from "react-swipeable";
 
 function SongCard(props) {
 	const [tagData, setTagData] = useState([]);
+	const [isLoading, setLoading] = useState(true);
 	const { lang } = useParams();
 	const ref = useRef(null);
-	const isSongUnit = props.song.song_is_unit.data[0];
+	const isSongUnit = props.song?.song_is_unit.data[0];
 	let timerID;
 	const componentRef = useRef();
-		
+	const [isClicked, setClicked] = useState(false);
 	const [isSwiped, setSwiped] = useState(false);
 	const handlers = useSwipeable({
 			onSwipedRight: (eventData) => setSwiped(false),
-  		onSwipedLeft: (eventData) => {
-				setSwiped(true);
-			}
+  		onSwipedLeft: (eventData) => setSwiped(true)
 	});
-	
-	useEffect(()=>{ 
-		isSongUnit ?
-			axios.get('api/song_unit?song_id=' + props.song.song_id)
-			.then((res)=>{setTagData(res.data.row);}) 
-			.catch(()=>{})
-		:
-			axios.get('api/song_idol_cv?song_id=' + props.song.song_id)
-			.then((res)=>{setTagData(res.data.rows);}) 
-			.catch(()=>{});
-		
-		function handleClick(e: any) { 
+	function handleClick(e: any) { 
 			if(componentRef && componentRef.current){ 
 				const ref: any = componentRef.current;
 				if(!ref.contains(e.target)){ setSwiped(false); }
+				
 			} 
-		}
-		document.addEventListener("touchend", handleClick, false);	
+		}	
+
+	useEffect(()=>{ 
+		setLoading(true);
+		setSwiped(false);
+		if(props.song)
+			isSongUnit ?
+				axios.get('/api/song_unit?song_id=' + props.song.song_id)
+				.then((res)=>{setTagData(res.data.rows); setLoading(false);}) 
+				.catch(()=>{})
+			:
+				axios.get('/api/song_idol_cv?song_id=' + props.song.song_id)
+				.then((res)=>{setTagData(res.data.rows); setLoading(false);}) 
+				.catch(()=>{});
+		document.addEventListener("touchstart", handleClick, false);	
 		return ()=>{
 			clearTimeout(timerID);
-			document.removeEventListener("touchend", handleClick);
+			document.removeEventListener("touchstart", handleClick);
 		}
-	}, []);
-	
+	}, [props.song]);
+
+	if(!props.song) return (null);
+
 	return (
-		<div {...handlers}>
-		<div className={`songCard pid${props.song.production_id} ${isSwiped?'swiped':''}`}  ref={componentRef} onClick={()=>{
-				timerID = setTimeout(()=>props.dispatch({type:'songCardClicked', payload:props.song}), 100);
+		<div className={isClicked?'clicked':''} {...handlers}>
+		<div className={`songCard pid${props.song.production_id} ${isSwiped?'swiped':''} ${isLoading?'loading':'loaded'}`}  ref={componentRef} onClick={()=>{
+				setClicked(true);
+				setSwiped(false);
+				props.dispatch({type:'songCardClicked', payload:{song: props.song, tagData: tagData}});
+				timerID = setTimeout(()=>{
+					setClicked(false);
+				}, 300);
+				
 			}}>
 			<div className="coverImgArea">
 				<div className="coverImg">
 					<img src={"/api/img/album/"+props.song.album_id}></img>
 				</div>
 			</div>
-			<div className="title">{eval('props.song.song_title_'+lang)||props.song.song_title_en}</div>
+			<div className="title"><span>{eval('props.song.song_title_'+lang)||props.song.song_title_en}</span></div>
 
 			<div className='tagsArea' ref={ref}>
 				{
@@ -67,7 +77,12 @@ function SongCard(props) {
 							)
 						})
 					:
-						<Tag classify='unit' id={tagData.unit_id} name={tagData.unit_name_kr} color={tagData.unit_color}></Tag>
+						tagData.map((unit, idx)=>{
+							return (
+									<Tag key={idx} classify='unit' id={unit.unit_id} name={unit.unit_name_kr} color={unit.unit_color}></Tag>
+							)
+						})
+						
 				}
 
 			</div>
