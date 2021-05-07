@@ -52,7 +52,10 @@ function SongCard(props) {
 		<div className={`songCard pid${props.song.production_id} ${isSwiped?'swiped':''} ${isLoading?'loading':'loaded'}`}  ref={componentRef} onClick={()=>{
 				setClicked(true);
 				setSwiped(false);
-				props.dispatch({type:'songCardClicked', payload:{song: props.song, tagData: tagData}});
+				if(props.song?.song_id!==props.playerReducer.song?.song_id)
+					 props.dispatch({type:'songCardClicked', payload:{song: props.song, tagData: tagData}});
+				props.dispatch({type:'playerActive'});
+				
 				timerID = setTimeout(()=>{
 					setClicked(false);
 				}, 300);

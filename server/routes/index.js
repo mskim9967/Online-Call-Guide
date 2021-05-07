@@ -117,6 +117,9 @@ router.get('/img/:table/:id', (req, res) => {
 	if(req.params.id !== 'undefined')	res.sendFile(req.params.id+'.webp', { root: __dirname+'/../img/'+req.params.table});
 });
 
+router.get('/audio/:id', (req, res) => {
+	if(req.params.id !== 'undefined')	res.sendFile(req.params.id+'.mp3', { root: __dirname+'/../audio'});
+});
 
 
 module.exports = router;

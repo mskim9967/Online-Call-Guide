@@ -17,7 +17,7 @@ function Nav(props) {
 	
 	return (
 		<div className="nav">
-			<div className={'menu '+ (props.playerReducer.isActive ? "inactive": "")}>
+			<div className={'menu '+ (props.isPlayerActive ? "inactive": "")}>
 				<div className={"tab music " + (props.nowPage === 1 ? "active" : "")} onClick={()=>{
 					if(props.nowTab != 1) history.push(`/${lang}/songs`);
 					props.dispatch({type:'changePage', payload:1});
@@ -85,6 +85,7 @@ function Nav(props) {
 
 function stateToProps(state) {
     return {
+				isPlayerActive: state.playerActiveReducer,
         playerReducer : state.playerReducer,
 				lang: state.langReducer,
 				nowPage: state.pageReducer

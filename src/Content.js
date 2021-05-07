@@ -20,7 +20,7 @@ function Content(props){
 	return(
 		<div className={"content "}>
 			<div className={"page " + (props.nowPage == 1 ? "active" : "")} >
-				<div className={"songs "+ (props.playerReducer.isActive ? "scrollLock " : "") } >
+				<div className={"songs "+ (props.isPlayerActive ? "scrollLock " : "") } >
 					<SongCardList></SongCardList>
 				</div>
 			</div>
@@ -52,6 +52,7 @@ function Content(props){
 
 function stateToProps(state) {
     return {
+				isPlayerActive: state.playerActiveReducer,
         playerReducer : state.playerReducer,
 				lang: state.langReducer,
 				nowPage: state.pageReducer

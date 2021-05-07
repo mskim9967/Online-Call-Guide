@@ -17,26 +17,27 @@ const theme = createMuiTheme({
   },
 });
 
-let playerDefault = {isActive:false, song:null, tagData: null};
-function playerReducer(state = playerDefault, action) {
-    if(action.type === 'active') {
-        let cp = JSON.parse(JSON.stringify(state));
-				cp.isActive=true;
-				return cp;
+function playerActiveReducer(state = false, action) {
+    if(action.type === 'playerActive') {
+			return true;
     } 
-		else if(action.type === 'inactive') {
-        let cp = JSON.parse(JSON.stringify(state));
-				cp.isActive=false;
-        return cp;
+		else if(action.type === 'playerInactive') {
+			return false;
     } 
-		else if(action.type === 'songCardClicked') {
-        let cp = JSON.parse(JSON.stringify(state));
-				cp.isActive=true;
-				cp.song = action.payload.song;
-				cp.tagData = action.payload.tagData;
-        return cp;
-    }
     return state;
+}
+
+
+let playerDefault = {reload: false, song:null, tagData: null};
+function playerReducer(state = playerDefault, action) { 
+	if(action.type === 'songCardClicked') {
+		let cp = JSON.parse(JSON.stringify(state));
+		cp.reload=!cp.reload;
+		cp.song = action.payload.song;
+		cp.tagData = action.payload.tagData;
+		return cp;
+	}
+	return state;
 }
 
 function langReducer(state = 'kr', action) {
@@ -53,7 +54,7 @@ function pageReducer(state = 1, action) {
 
 
 
-let store = createStore(combineReducers({playerReducer, langReducer, pageReducer}));
+let store = createStore(combineReducers({playerActiveReducer, playerReducer, langReducer, pageReducer}));
 
 ReactDOM.render(
   <React.StrictMode>

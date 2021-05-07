@@ -44,6 +44,7 @@ function App(props) {
 
 function stateToProps(state) {
     return {
+				isPlayerActive: state.playerActiveReducer,
         playerReducer : state.playerReducer,
 				lang: state.langReducer,
 				nowPage: state.pageReducer

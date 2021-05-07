@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux'
 import { useParams, Route } from 'react-router-dom';
+import { useSwipeable } from "react-swipeable";
 
 import PlayArrowIcon from '@material-ui/icons/PlayArrow';
 import PauseIcon from '@material-ui/icons/Pause';
@@ -10,124 +11,93 @@ import SkipPreviousIcon from '@material-ui/icons/SkipPrevious';
 import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
+const audio = new Audio();
 
+document.documentElement.style.setProperty("--idc", '#ff0000');
 function Player(props) {
 	const { lang } = useParams();
+	const [isAudioPaused, setAudioPaused] = useState(true);
+	const [isPlaylistActive, setPlaylistActive] = useState(false);
+	const [unitIdols, setUnitIdols] = useState([]);
+	const [isSwiped, setSwiped] = useState(false);
+	const handlers = useSwipeable({
+			onSwipedRight: (eventData) => setPlaylistActive(false),
+  		onSwipedLeft: (eventData) => setPlaylistActive(true)
+	});
 	var buttonColor= '#eeeeee', color='#ffffff';	
-	if(props.playerReducer.tagData?.length === 1)
+	
+	function playPause(){
+		if(audio.paused) {			
+			audio.play();
+		}
+		else {
+			audio.pause();
+		}
+		setAudioPaused(audio.paused);
+	}
+	
+	
+	useEffect(()=>{
+		if(props.playerReducer.tagData?.length === 1)
 		 color=hex_setSat(props.playerReducer.song?.song_is_unit.data[0]?props.playerReducer.tagData[0].unit_shown_color:props.playerReducer.tagData[0].idol_shown_color, 0.13);
-	else color='#ffffff';
-	document.documentElement.style.setProperty("--flc", color);
+		else 
+			color='#ffffff';
+		
+		if(props.playerReducer.song?.song_is_unit.data[0])
+				axios.get(`/api/song_unit_idol_cv/search?song_id=${props.playerReducer.song.song_id}`)
+				.then((res)=>{setUnitIdols(res.data.rows)}) 
+				.catch(()=>{});
+
+		document.documentElement.style.setProperty("--flc", color);
+		audio.src = `/api/audio/${props.playerReducer.song?.song_id}`;
+		audio.addEventListener('canplaythrough',()=>{
+			audio.play();
+			setAudioPaused(false);
+		}, false);
+		return ()=>{
+			audio.pause();
+			setAudioPaused(true);
+		}
+	},[props.playerReducer.reload]);
+	
+
 	return (
 		<>
-		<div className={`coverImg ${props.playerReducer.isActive ? "active" : ""}`} onClick={()=>{props.playerReducer.isActive?props.dispatch({type:'inactive'}):props.dispatch({type:'active'})}}>
+		<div className={`coverImg ${props.isPlayerActive ? "active" : ""}`} onClick={()=>{props.isPlayerActive?props.dispatch({type:'playerInactive'}):props.dispatch({type:'playerActive'})}}>
 			<div className='dot'></div>
 			{props.playerReducer.song!==null && <img src={"/api/img/album/"+props.playerReducer.song.album_id}></img>}
 		</div>
 		
-		<div className={"playerPage " + (props.playerReducer.isActive ? "active" : "")}>
-			<div className="lyricArea">
-				<div className="text">
-					今日はオタク君大好物をもってきたよー！
-쿄우와 오타쿠쿤 다이코우부츠오 못테키타요-
-오늘은 오타쿠 군들이 무지 좋아하는걸 들고 왔어-!
+		<div className={"playerPage " + (props.isPlayerActive ? "active" : "")} {...handlers}>
+				{
+					(props.playerReducer.song?.song_is_unit.data[0] || props.playerReducer.tagData?.length>1) &&
+						<div className="infoArea"> {
+							eval(props.playerReducer.song.song_is_unit.data[0]?unitIdols:props.playerReducer.tagData).map((idol, i)=>{
+								return(<div className={`idolImgArea ${false?'active':''}`} ><img src={"/api/img/idol/"+idol.idol_id}></img></div>)
+						})} </div>
 
-オタクのみんなー！わかってるなー！？一緒にぶちあがっちゃおう！！
-오타쿠노민나- 와캇테루나- 잇쇼니 부치아갓챠오우
-오타쿠들아―! 알고있지―!? 다함께 끓어올라보자!!
-
-せーの！
-세-노
-둘-셋!
-
-うりゃおい！　うりゃおい！　うりゃおい！　うりゃおい！
-우랴오이! 우랴오이! 우랴오이! 우랴오이!
-우랴오이! 우랴오이! 우랴오이! 우랴오이!
-
-パンパパパパンパン　よっしゃシンデレラ！
-팡파파파팡팡 욧샤 신데레라
-팡파파파팡팡 으쌰 신데렐라!
-
-(キュート！クール！パッション！ピンク！ブルー！オレンジ！ジャージャー！)
-(큐-토 쿠-루 팟숑 핑쿠 브루- 오렌지 쟈-쟈-)
-(큐트! 쿨! 패션! 핑크! 블루! 오렌지! 쟈―쟈―!)
-
-全力ダンシン
-젠료쿠 단싱
-전력 댄싱
-
-喉枯れシンギン
-노도카레 싱깅
-목 터져라 싱잉
-
-チェキって　ハグって
-체킷테 하굿테
-사진찍고 허그하고
-
-いいこいいこ
-이이코 이이코
-착하다 착해
-
-無茶ブリ上等
-무챠부리 죠우토우
-막 나가기 환영
-
-繋がり退場
-츠나가리 타이죠우
-선 넘는거 퇴장
-
-バイトバイトバイト
-바이토 바이토 바이토
-알바 알바 알바
-
-So!　アイドル！
-So! 아이도루!
-So! 아이돌!
-
-(でっかい！ふつう！たぶんふつう！[17])
-(뎃카이 후츠우 타분후츠우)
-(큼! 보통! 아마 보통!)
-
-(デツブツー！デツブーツー！)
-(데츠부츠- 데츠부-츠-)
-(큼보통―! 큼보―통―!)
-
-最高！
-사이코
-최고!
-
-(リンゴ！ポエム！AB！[18])
-(링고 포에무 AB)
-(사과! 포엠! AB!)
-
-(リポービー！リポービー！)
-(리포-비- 리포-비-)
-(리포―B―! 리포―B―!)
-
-どうせ推し変　みんなすんじゃん(あ～～～りあむ！！！)
-도우세 오시헨 민나슨쟝(아- 리아무)
-어차피 환승 다들 하잖아 (아~~~ 리아무!!!)
-
-DD[19]なんて　浮気まんまん(あ～～～りあむ！！！)
-DD난테 우와키 만만(아- 리아무)
-합승이랍시고 바람기 만땅 (아~~~ 리아무!!!)
-
-どうせぼくに　No No 人権(あ～～～りあむ！！！)
-도우세보쿠니 No No 진켄(아- 리아무)
-어차피 나한테 No No 인권 (아~~~ 리아무!!!)
-
-誰でも良いから　人権ください
-다레데모 이이카라 진켄쿠다사이
-아무라도 좋으니까 인권 주십셔
-
-BURN BURN　みんなが燃やせば(PPPH PPPH)
-BURN BURN 민나가 모야세바(PPPH PPPH)
-BURN BURN 모두가 불타버리면 (PPPH PPPH)
-
-ワンチャン　あるかも！？なんて(PPPH PPPH)
-
+				}
+			<div className="callGuideArea">
+	
+				<div className={`lyricArea ${isPlaylistActive&&'inactive'}`}>
+					<div className="text">
+						<Dddd></Dddd>
+					</div>
 				</div>
+				<div className={`playlistArea ${!isPlaylistActive&&'inactive'}`}>
+					<p>playlistArrddddddddddddddddddddr</p>
+				</div>
+				<div className='closeIconArea'><ExpandMoreIcon style={{fontSize: 30, color:buttonColor}} onClick={()=>{props.dispatch({type:'playerInactive'})}}></ExpandMoreIcon></div>
+				<div className='pageChangeIconArea'>{
+					isPlaylistActive?	
+						<RecordVoiceOverIcon style={{fontSize: 25, color:buttonColor}} onClick={()=>{setPlaylistActive(false)}}></RecordVoiceOverIcon>
+					:
+						<PlaylistPlayIcon style={{fontSize: 35, color:buttonColor}} onClick={()=>{setPlaylistActive(true)}}></PlaylistPlayIcon>
+				}</div>
+
 			</div>
+			
 			<div className='playerArea'>
 				<div className='coverImgArea'></div>
 				
@@ -146,8 +116,12 @@ BURN BURN 모두가 불타버리면 (PPPH PPPH)
 				}</div>
 				<div className='buttonsArea'>
 					<SkipPreviousIcon style={{fontSize: 25, color:buttonColor}}></SkipPreviousIcon>
-					<PauseIcon style={{fontSize: 35, color:buttonColor}}></PauseIcon>
-					{/*<PlayArrowIcon style={{fontSize: 35, color:buttonColor}}></PlayArrowIcon>*/}
+					{
+						isAudioPaused?
+						<PlayArrowIcon style={{fontSize: 35, color:buttonColor}} onClick={playPause}></PlayArrowIcon>
+						:
+						<PauseIcon style={{fontSize: 35, color:buttonColor}} onClick={playPause}></PauseIcon>
+					}
 					<SkipNextIcon style={{fontSize: 25, color:buttonColor}}></SkipNextIcon>
 				</div>
 				
@@ -181,9 +155,25 @@ function hex_setSat(H, sat) { // Convert hex to RGB first
 	let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0); return `rgb(${f(5)},${f(3)},${f(1)})`; 
 }
 
+function Dddd() {
+	var ssss=[];
+	for(var i=0;i<100;i++)
+			ssss.push('가사입니다다다다다다다다다');
+	return (
+		<div>
+			{ssss.map((e)=>{
+				return <div>{e}<br/></div>
+			})}
+		</div>
+	)
+}
+
 function stateToProps(state) {
     return {
-        playerReducer : state.playerReducer
+				isPlayerActive: state.playerActiveReducer,
+        playerReducer : state.playerReducer,
+				lang: state.langReducer,
+				nowPage: state.pageReducer
     }
 }
 

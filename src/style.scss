@@ -8,8 +8,10 @@ $timeA : .1s;
 
 :root{
 	--flc: #ffffff;
+	--idc: #ffffff;
 }
 $flc: var(--flc);
+$idc: var(--idc);
 
 .nav {
 	z-index: 10;
@@ -125,28 +127,104 @@ $flc: var(--flc);
 	.playerPage {
 		position: fixed;
 		z-index: -2;
-		width:100vw;
+		width:100%;
 		height:100%;
 		bottom:0;
 		left:0;
 		background: #202020;
 		background-size: cover;
-		
+		max-height: 0;
 		opacity: 0;
-		max-height: 0px;
 		transform: translateY(200px);
 		transition: opacity $timeC, transform $timeC, max-height 0s $timeC;	
 		
-		.lyricArea {
-			height:100%;
-			overflow: auto;
-			color: white;
-			.text{
-				font-size: 0.9rem;
-				text-align: center;
-				line-height: 200%;
+		display: flex;
+		flex-direction: column;
+		.infoArea {
+			height:85px;
+			padding: 0 10px;
+			display: flex;
+			justify-content: space-evenly;
+			align-items: center;
+			box-shadow: 0 0 20px 0px black;
+			border-radius: 0 0 20px 20px;
+			
+			.idolImgArea.active{
+				box-shadow: 0 0 10px 3px $idc;
+				img{
+					filter: brightness(100%);
+				}	
+			}
+			.idolImgArea {
+				box-shadow: inset 0 0 10px 3px black;
+				flex:0 0 65px;
+				height:65px;
+				border-radius: 50%;
+				overflow:hidden;
+				img{
+					filter: brightness(50%);
+					position: relative;
+					z-index: -1;
+					max-width: 100%;
+					height: auto;
+				}
+			}
+		}
+		
+		.callGuideArea {
+			flex:1;
+			height:50%;
+			position: relative;
+			.closeIconArea {
+				position:absolute;
+				top:15px;
+				right:15px;
+			}
+			.pageChangeIconArea {
+				position:absolute;
+				bottom:75px;
+				right:15px;
+				
 			}
 			
+			.lyricArea.inactive {
+				transform: translateX(-100vw);
+				transition: transform $timeB;
+			}
+			.lyricArea {
+				position:absolute;
+				transition: transform $timeB;
+				height:100%;
+				overflow: auto;		
+				width:100%;
+				overflow: auto;		
+				color: white;
+				padding: 50px 20px 120px 20px;
+				.text{		
+					font-size: 0.9rem;
+					text-align: center;
+					line-height: 200%;
+				}				
+			}
+
+			.playlistArea.inactive {
+				transform: translateX(100vw);
+				transition: transform $timeB;
+			}
+			.playlistArea {
+				position:absolute;
+				transition: transform $timeB;
+				height:100%;
+				overflow: auto;		
+				width:100%;
+				overflow: auto;		
+				color: white;
+				padding: 50px 20px 120px 20px;
+					font-size: 0.9rem;
+					text-align: center;
+					line-height: 200%;
+								
+			}
 		}
 		.playerArea {
 			position: fixed;
@@ -156,12 +234,12 @@ $flc: var(--flc);
 			height:68px;
 			width: 100%;
 			backdrop-filter: blur(8px); 
-			//box-shadow: 0 0 10px -1px nth($gray,8);
-			padding: 0px 7px;
-			
+			box-shadow: 0 0 10px -1px black;
+			padding: 0px 12px;
+
 			display: grid;
 			grid-template-columns: 60px 3fr 1.5fr;
-			grid-template-rows: 1fr 0.75fr;
+			grid-template-rows: 1fr 0.82fr;
 			column-gap: 1px;
 
 			.coverImgArea {
@@ -179,15 +257,15 @@ $flc: var(--flc);
 				display: flex;
 				align-items: flex-end;
 				//justify-content: center;
-				
+
 				min-width: 0;
 				span{
-					background:-webkit-linear-gradient(45deg, nth($gray,1), $flc);
+					background:-webkit-linear-gradient(45deg, nth($gray,2), $flc);
 					-webkit-background-clip: text;
 					-webkit-text-fill-color: transparent;
 					white-space: nowrap;
-					font-weight: 700;
-					font-size: 1.3rem;
+					font-weight: 600;
+					font-size: 1.1rem;
 					overflow: hidden;
 					text-overflow: ellipsis;
 					//color: nth($gray,1);
@@ -201,11 +279,11 @@ $flc: var(--flc);
 				display: flex;
 				align-items: flex-start;
 				//justify-content: center;
-				
+
 				min-width: 0;
 				span{
-					font-weight: 500;
-					font-size: 0.8rem;
+					font-weight: 400;
+					font-size: 0.75rem;
 					overflow: hidden;
 					text-overflow: ellipsis;
 					color: nth($gray,2);
@@ -219,8 +297,9 @@ $flc: var(--flc);
 				align-items: center;
 				justify-content: space-between;
 			}
-			
+
 		}
+	
 	}
 }
 
