@@ -12,6 +12,7 @@ import PlaylistPlayIcon from '@material-ui/icons/PlaylistPlay';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import RecordVoiceOverIcon from '@material-ui/icons/RecordVoiceOver';
+
 const audio = new Audio();
 
 document.documentElement.style.setProperty("--idc", '#ff0000');
@@ -21,9 +22,16 @@ function Player(props) {
 	const [isPlaylistActive, setPlaylistActive] = useState(false);
 	const [unitIdols, setUnitIdols] = useState([]);
 	const [isSwiped, setSwiped] = useState(false);
+	const [audioProgress, setAudioProgress] = useState(0);
 	const handlers = useSwipeable({
 			onSwipedRight: (eventData) => setPlaylistActive(false),
   		onSwipedLeft: (eventData) => setPlaylistActive(true)
+	});
+	const [cp, setCp] = useState(0);
+	const audioHandlers = useSwipeable({
+		onSwipeStart: (e)=>{audio.pause();setCp(audioProgress);setAudioPaused(true)},
+		onSwiping: (e)=>{setAudioProgress(cp+e.deltaX/6)},
+		onSwiped: (e)=>{audio.currentTime=audioProgress/100*audio.duration;playPause()}
 	});
 	var buttonColor= '#eeeeee', color='#ffffff';	
 	
@@ -37,6 +45,14 @@ function Player(props) {
 		setAudioPaused(audio.paused);
 	}
 	
+	useEffect(()=>{
+		let timerID;
+		if(!isAudioPaused)
+			timerID = setInterval(()=>setAudioProgress(parseFloat(audio.currentTime*1000)/(audio.duration*1000)*100),400);
+		return ()=>{
+			clearInterval(timerID);
+		}
+	},[isAudioPaused]);
 	
 	useEffect(()=>{
 		if(props.playerReducer.tagData?.length === 1)
@@ -55,6 +71,7 @@ function Player(props) {
 			audio.play();
 			setAudioPaused(false);
 		}, false);
+		setAudioProgress(0);
 		return ()=>{
 			audio.pause();
 			setAudioPaused(true);
@@ -64,12 +81,12 @@ function Player(props) {
 
 	return (
 		<>
-		<div className={`coverImg ${props.isPlayerActive ? "active" : ""}`} onClick={()=>{props.isPlayerActive?props.dispatch({type:'playerInactive'}):props.dispatch({type:'playerActive'})}}>
+		<div className={`${!props.playerReducer.song&&'init'} coverImg ${props.isPlayerActive ? "active" : ""}`} onClick={()=>{props.isPlayerActive?props.dispatch({type:'playerInactive'}):props.dispatch({type:'playerActive'})}}>
 			<div className='dot'></div>
 			{props.playerReducer.song!==null && <img src={"/api/img/album/"+props.playerReducer.song.album_id}></img>}
 		</div>
 		
-		<div className={"playerPage " + (props.isPlayerActive ? "active" : "")} {...handlers}>
+		<div className={"playerPage " + (props.isPlayerActive ? "active" : "")} >
 				{
 					(props.playerReducer.song?.song_is_unit.data[0] || props.playerReducer.tagData?.length>1) &&
 						<div className="infoArea"> {
@@ -78,7 +95,7 @@ function Player(props) {
 						})} </div>
 
 				}
-			<div className="callGuideArea">
+			<div className="callGuideArea" {...handlers}>
 	
 				<div className={`lyricArea ${isPlaylistActive&&'inactive'}`}>
 					<div className="text">
@@ -98,7 +115,10 @@ function Player(props) {
 
 			</div>
 			
-			<div className='playerArea'>
+			<div className='playerArea'  {...audioHandlers}>
+				<div className='progressBarArea'>
+					<div className='progressBar' style={{width: audioProgress+'%'}}></div>
+				</div>
 				<div className='coverImgArea'></div>
 				
 				<div className='titleArea'><span>{eval('props.playerReducer.song?.song_title_'+lang)||props.playerReducer.song?.song_title_en}</span></div>

@@ -4,6 +4,10 @@ import { connect } from 'react-redux'
 import { useParams, Route } from 'react-router-dom';
 import { useSwipeable } from "react-swipeable";
 
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
+import { Alert } from '@material-ui/lab'
+import { IconButton } from '@material-ui/core'
+
 function SongCard(props) {
 	const [tagData, setTagData] = useState([]);
 	const [isLoading, setLoading] = useState(true);
@@ -38,10 +42,10 @@ function SongCard(props) {
 				axios.get('/api/song_idol_cv?song_id=' + props.song.song_id)
 				.then((res)=>{setTagData(res.data.rows); setLoading(false);}) 
 				.catch(()=>{});
-		document.addEventListener("touchstart", handleClick, false);	
+		document.addEventListener("touchend", handleClick, false);	
 		return ()=>{
 			clearTimeout(timerID);
-			document.removeEventListener("touchstart", handleClick);
+			document.removeEventListener("touchend", handleClick);
 		}
 	}, [props.song]);
 
@@ -49,6 +53,9 @@ function SongCard(props) {
 
 	return (
 		<div className={isClicked?'clicked':''} {...handlers}>
+			<div className={`${isLoading?'loading':'loaded'} behind alignCenter` }>
+				<div className='iconArea'><IconButton variant='outlined' size='small' ><PlaylistAddIcon></PlaylistAddIcon></IconButton></div>
+			</div>
 		<div className={`songCard pid${props.song.production_id} ${isSwiped?'swiped':''} ${isLoading?'loading':'loaded'}`}  ref={componentRef} onClick={()=>{
 				setClicked(true);
 				setSwiped(false);
@@ -114,7 +121,10 @@ function adjust(color, amount) {
 
 function stateToProps(state) {
     return {
-        playerReducer : state.playerReducer
+				isPlayerActive: state.playerActiveReducer,
+        playerReducer : state.playerReducer,
+				lang: state.langReducer,
+				nowPage: state.pageReducer
     }
 }
 

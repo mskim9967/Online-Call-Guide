@@ -52,18 +52,24 @@ function pageReducer(state = 1, action) {
     return state;
 }
 
+function themeReducer(state = 'light', action) {
+    if(action.type === 'darkTheme') {
+      return 'dark';
+    } 
+		if(action.type === 'lightTheme') {
+      return 'light';
+    } 
+    return state;
+}
 
-
-let store = createStore(combineReducers({playerActiveReducer, playerReducer, langReducer, pageReducer}));
+let store = createStore(combineReducers({playerActiveReducer, playerReducer, langReducer, pageReducer, themeReducer}));
 
 ReactDOM.render(
   <React.StrictMode>
 	<BrowserRouter>
-	<MuiThemeProvider theme={theme}>
 		 <Provider store={store}>
 	  <App />
 			  </Provider>
-	</MuiThemeProvider>
 	</BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')

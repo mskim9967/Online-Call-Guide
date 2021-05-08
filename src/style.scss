@@ -1,6 +1,20 @@
 $pink : #ffedf0, #ffd2d7, #f4a2a3, #ed7e7f, #f9615e, #fe5245, #f14b45, #de413e;
+$gray: #fbfbfb, #e5e5e5, #d4d4d4, #b0b0b0, #8f8f8f, #686868, #545454, #363636 !global;
 
-$gray: #fbfbfb, #e5e5e5, #d4d4d4, #b0b0b0, #8f8f8f, #686868, #545454, #363636;
+// .dark {
+// 	$gray: #000000, #000000, #000000,  #000000, #000000, #000000,#000000, #000000, #000000 !global;
+// }
+
+// .light {
+// 	$text: #545454 !global;
+// 	$pageBg: #fbfbfb !global;
+// 	$tabBg: #ffffff !global;
+// 	$lightShadow: #ffffff !global;
+// 	$shadow: #8f8f8f !global;
+// 	$darkShadow: #000000 !global;
+// }
+
+
 
 $timeC : .5s; 
 $timeB : .2s;
@@ -9,50 +23,164 @@ $timeA : .1s;
 :root{
 	--flc: #ffffff;
 	--idc: #ffffff;
+	
+	--text: #545454 ;
+	--pageBg: #fbfbfb;
+	--tabBg: #ffffff;
+	--lightShadow: #ffffff;
+	--shadow: #8f8f8f;
+	--darkShadow: #000000;
+	
+	--im:0;
+	--cg:0;
+	--ml:0;
+	--sm:0;
+	--sc:0;
 }
 $flc: var(--flc);
 $idc: var(--idc);
 
+$text: var(--text);
+$pageBg: var(--pageBg);
+$tabBg:  var(--tabBg);
+$lightShadow: var(--lightShadow);
+$shadow: var(--shadow);
+$darkShadow: var(--darkShadow);
+
+$im: var(--im);
+$cg: var(--cg);
+$ml: var(--ml);
+$sm: var(--sm);
+$sc: var(--sc);
+
+body {
+	background: $pageBg;
+}
+.alignCenter{
+	display:flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.popup.inactive{
+	transform: translateY(-100px);
+	transition: transform $timeC;
+}
+.popup {
+	z-index:2;
+	position: relative;
+	transition: transform $timeC;
+	
+	.userImgArea{
+		position: fixed;
+	
+		top:15px;
+		right:15px;
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		
+		background: nth($gray, 1);
+		border: solid nth($gray, 3) 1px;
+		box-shadow: 0 5px 5px 0 $shadow;
+		
+		.iconArea {
+			height:100%;
+		}
+	}
+	
+	.detailsArea.inactive {
+		height:0;
+		transition: height $timeB;
+	}
+	.detailsArea{
+		transition: height $timeB;
+		position: fixed;
+		top:70px;
+		right:15px;
+		width: 220px;
+		height: 230px;
+		border-radius: 13px;
+		background: white;
+		box-shadow: inset 0 0 0 2px $shadow;
+		padding: 0 10px;
+		
+		overflow:hidden;
+		
+		display: grid;
+		grid-template-columns:1fr 5fr;
+		grid-template-rows: 2fr 1fr 1fr;
+		
+		.loginArea {
+			grid-column: 1 / span 2;
+		}
+	}
+	
+	.bg.inactive {
+		
+		display: relative;
+		opacity: 0%;
+		transition: opacity $timeB, max-height 0s $timeB;
+		max-height: 0px;
+		
+	}
+	.bg {
+		z-index: -1;
+		
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: #000000;
+		
+		position: fixed;
+		opacity:70%;
+		transition: opacity $timeC, max-height 0s;
+
+		max-height: 100%;
+	}
+}
+
 .nav {
-	z-index: 10;
+	z-index: 1;
 	position: fixed;
 	width: 100%;
-	height: 80px;
+	height: 100px;
 	bottom: 0;
 	
 	.menu {
 		display: grid;
 		grid-template-columns: 2fr 2fr 2fr 2fr;
 		transition: transform $timeC;
-		
+		height:100%;
 		.tab {
 			position:relative;
 
 			// border: 2px solid #c4c4c4;
 			border-radius: 12px 12px 0 0;
 			border-bottom-style: none;
-
+			height:100%;
 			text-align: center;
 			font-size: 0.9rem;
 			font-weight:400;
 
 			padding:5px;
 			
-			background: white;
+			background: $tabBg;
 
-			box-shadow: 0px -7px 8px -4px #bfbfbf, inset 0 0 20px 0px nth($gray,1);
+			box-shadow: 0px -7px 8px -4px $shadow, inset 0 0 20px 0px $lightShadow;
 
-			transform: translateY(16px);
+			transform: translateY(36px);
 			transition: transform $timeA;
 
 			.label {
 				position:relative;
 				top: -8px;
-				color: nth($gray,7);
+				color: $text;
 			}
 		}
 		.tab.active {
-			transform: translateY(9px);
+			transform: translateY(28px);
 			transition: transform $timeA;
 		}
 
@@ -75,20 +203,23 @@ $idc: var(--idc);
 	}
 	
 	.coverImg {
+		&.init{
+			transform:translateY(150px);
+		}
 		position: fixed;
 		z-index: -1;
 		width: 120px;
 		height: 120px;
 		margin-left:-60px;
 		border-radius: 50%;
-		background: nth($gray,1);
+		background: #e5e5e5;
 		left: 50%;
 		bottom: 15px;
 		transition: transform $timeC, left $timeC, bottom $timeC;
 		overflow: hidden;
 
-		border: 5px solid nth($gray,1);
-		box-shadow: 0 0 5px -1px nth($gray,5);
+		border: 5px solid #ffffff;
+		box-shadow: 0 0 5px -1px $shadow;
 
 		display:flex;
 		align-items: center;
@@ -98,8 +229,8 @@ $idc: var(--idc);
 			width: 20px;
 			height: 20px;
 			border-radius: 50%;
-			background: nth($gray,1);
-			box-shadow: inset 0 0 5px -1px nth($gray,5), 0 0 0px 3px nth($gray,1);
+			background: #e5e5e5;
+			box-shadow: inset 0 0 5px -1px $shadow, 0 0 0px 3px $lightShadow;
 			display:flex;
 			align-items: center;
 			justify-content: center;
@@ -242,6 +373,17 @@ $idc: var(--idc);
 			grid-template-rows: 1fr 0.82fr;
 			column-gap: 1px;
 
+			.progressBarArea {
+				position: absolute;
+				top:0;
+				width:100%;
+				height:2px;
+				
+				.progressBar{
+					background:$flc;
+					height:100%;
+				}
+			}
 			.coverImgArea {
 				grid-column: 1 / span 1;
 				grid-row: 1 / span 2;
@@ -351,7 +493,8 @@ $idc: var(--idc);
 		display: none;
 		width:100%;
 		height:100%;
-		background: nth($gray,1);
+		background: $pageBg;
+
 		padding: 20px 20px 150px 20px;
 		overflow: auto;
 	
@@ -375,7 +518,6 @@ $idc: var(--idc);
 					background-color: nth($gray,4);
 
 					.songSearchInput {
-
 						z-index:1;
 						font-size: 0.8rem;
 						align-items: center;
@@ -392,16 +534,32 @@ $idc: var(--idc);
 			}
 
 			.songCardList {
+				$songCardHeight: 80px;
+
 				padding: 0 3px 0 3px;
 				width:100%;
-
+				position: relative;
+				
+				.behind.loading{
+					opacity:0;
+					position: absolute;
+					
+				}
+				.behind.loaded{
+					opacity:100%;
+					transition: opacity 0s 0.7s;
+					position: absolute;
+					right:20px;
+					height:$songCardHeight;
+				}
+				
 				.clicked {
 					animation: scale $timeC;
 				}
 				.songCard.loaded{
 					opacity:1;
 					transform: scale(1);
-					transition: opacity 0.7s, transform 0.7s;
+					transition: opacity $timeC, transform $timeC;
 				}
 				.songCard.loading{
 					opacity:0;
@@ -413,23 +571,21 @@ $idc: var(--idc);
 				}
 
 				.songCard.pid1{
-					background: #fff7f7;
+					background: $im;
 				}
 				.songCard.pid2{
-					background: #e6efff;
+					background: $cg;
 				}
 				.songCard.pid3{
-					background: #ffffeb;
+					background: $ml;
 				}
 				.songCard.pid4{
-					background: #f7fffa;
+					background: $sm;
 				}
 				.songCard.pid5{
-					background: #f7ffff;
+					background: $sc;
 				}
 				.songCard {
-					$songCardHeight: 80px;
-
 					width:100%;
 					// height: $songCardHeight;
 					border-radius: 12px;
@@ -437,7 +593,7 @@ $idc: var(--idc);
 					padding: 7px 11px;
 					margin: 13px 0 13px 0;
 
-					box-shadow: 0px 0px 10px -3px nth($gray,4);
+					box-shadow: 0px 0px 10px -3px $shadow;
 
 					display: grid;
 					grid-template-columns: 1fr 3.5fr;
@@ -456,7 +612,7 @@ $idc: var(--idc);
 							width: calc(#{$songCardHeight}*0.8);
 							border-radius: 50%;
 							overflow: hidden;
-							box-shadow: inset 0 0 5px -1px nth($gray,5);
+							box-shadow: inset 0 0 5px -1px $shadow;
 							img{
 								position: relative;
 								z-index: -1;
@@ -473,14 +629,14 @@ $idc: var(--idc);
 						grid-row: 1 / span 1;
 
 						font-size: 1.5rem;
-						font-weight: 700;
-						color: nth($gray,7);
+						font-weight: 900;
+						color: $text;
 
 						min-width: 0;
 						span{
-						white-space: nowrap;
-						overflow: hidden;
-						text-overflow: ellipsis;
+							white-space: nowrap;
+							overflow: hidden;
+							text-overflow: ellipsis;
 						}
 					}
 					.tagsArea {
@@ -506,49 +662,6 @@ $idc: var(--idc);
 }
 
 
-.modalBg {
-	z-index: -3;
-	opacity: 0%;
-	position: fixed;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	background-color: #000000;
-	transition: opacity $timeC, max-height 0s $timeC;
-
-	max-height: 0px;
-}
-.lyricModal {
-	z-index: -2;
-	opacity: 0%;
-	position: fixed;
-	top: 3%;
-	left: 5vw;
-	width: 90%;
-	height: 94%;
-	background: #ffffff;
-	transform: translateY(20%);
-	transition: opacity $timeC, transform $timeC, max-height 0s $timeC;
-
-	max-height: 0px;
-}
-.active {
-	.modalBg {
-		display: relative;
-		opacity:60%;
-		transition: opacity $timeC, max-height 0s;
-
-		max-height: 999px;
-	}
-	.lyricModal {
-		opacity:100%;
-		transform: translateY(0%);
-		transition: opacity $timeC, transform $timeC, max-height 0s;
-
-		max-height: 999px;
-	}
-}	
 
 
 
