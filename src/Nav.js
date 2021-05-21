@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { connect } from 'react-redux'
-import { useParams, Route,useHistory, useLocation, Link } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
+import { useSwipeable } from "react-swipeable";
 
 import MusicNoteIcon from '@material-ui/icons/MusicNote';
 import QueueMusicIcon from '@material-ui/icons/QueueMusic';
@@ -11,73 +11,50 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import Player from './Player.js';
 
 function Nav(props) {
-	const { lang } = useParams();
+	const { lang  } = useParams();
 	const history = useHistory();
 	const location = useLocation();
+	const iconColor='#909090',iconActiveColor='#f0757c';
+	const handlers = useSwipeable({
+			onSwipedUp: (eventData) => history.push(`${location.pathname}?song_id=${props.playerReducer.song_id}`)
+	});
 	
 	return (
-		<div className="nav">
+		<div className="nav" {...handlers}>
 			<div className={'menu '+ (props.isPlayerActive ? "inactive": "")}>
-				<div className={"tab music " + (props.nowPage === 1 ? "active" : "")} onClick={()=>{
-					if(props.nowTab != 1) history.push(`/${lang}/songs`);
-					props.dispatch({type:'changePage', payload:1});
-				}}>
-					<MusicNoteIcon style={{fontSize: 35, color:"#fe5245"}}></MusicNoteIcon>
-					<p className="label">{
-						{
-							kr: '곡 선택',
-							en: 'Songs',
-							jp: '曲選択'
-						}[lang]
-					}</p>
+				<div className={"tab music " + (props.nowPage === 'songs' ? "active" : "")}
+					onClick={()=>{
+						if(props.nowPage !== 'songs') history.replace(`/${lang}/songs`);
+					}}>
+					<MusicNoteIcon style={{fontSize: 35, color:props.nowPage==='songs'?iconActiveColor:iconColor}}></MusicNoteIcon>
+					<p className="label">{{ kr: '곡 선택', en: 'Songs', jp: '曲選択' }[lang]}</p>
 				</div>
 
-
-				<div className={"tab playlist " + (props.nowPage === 2 ? "active" : "")} onClick={()=>{
-					if(props.nowTab != 2) history.push(`/${lang}/playlist`);
-					props.dispatch({type:'changePage', payload:2});
-				}}>
-					<QueueMusicIcon style={{fontSize: 35, color:"#fe5245"}}></QueueMusicIcon>
-					<p className="label">{
-						{
-							kr: '리스트',
-							en: 'Playlist',
-							jp: 'プレイリスト'
-						}[lang]
-					}</p>
+				<div className={"tab playlist " + (props.nowPage === 'playlist' ? "active" : "")}
+					onClick={()=>{
+						if(props.nowPage !== 'playlist') history.replace(`/${lang}/playlist`);
+					}}>
+					<QueueMusicIcon style={{fontSize: 35, color:props.nowPage==='playlist'?iconActiveColor:iconColor}}></QueueMusicIcon>
+					<p className="label">{{ kr: '리스트', en: 'Playlist', jp: 'プレイリスト' }[lang]}</p>
 				</div>
 
-				<div className={"tab search " + (props.nowPage === 3 ? "active" : "")} onClick={()=>{
-					if(props.nowTab != 3) history.push(`/${lang}/search`);
-					props.dispatch({type:'changePage', payload:3});
-				}}>
-					<SearchIcon style={{fontSize: 35, color:"#fe5245"}}></SearchIcon>
-					<p className="label">{
-						{
-							kr: '검색',
-							en: 'Search',
-							jp: '検索'
-						}[lang]
-					}</p>
+				<div className={"tab search " + (props.nowPage === 'search' ? "active" : "")}
+					onClick={()=>{
+						if(props.nowPage !== 'search') history.replace(`/${lang}/search`);
+					}}>
+					<SearchIcon style={{fontSize: 35, color:props.nowPage==='search'?iconActiveColor:iconColor}}></SearchIcon>
+					<p className="label">{{ kr: '검색', en: 'Search', jp: '検索'}[lang]}</p>
 				</div>
 
-
-				<div className={"tab setting " + (props.nowPage === 4 ? "active" : "")} onClick={()=>{
-					if(props.nowTab != 4) history.push(`/${lang}/setting`);
-					props.dispatch({type:'changePage', payload:4});
-				}}>
-					<SettingsIcon style={{fontSize: 35, color:"#fe5245"}}></SettingsIcon>
-					<p className="label">{
-						{
-							kr: '설정',
-							en: 'Setting',
-							jp: '設定'
-						}[lang]
-					}</p>
+				<div className={"tab setting " + (props.nowPage === 'setting' ? "active" : "")}
+					onClick={()=>{
+						if(props.nowPage !== 'setting') history.replace(`/${lang}/setting`);
+					}}>
+					<SettingsIcon style={{fontSize: 35, color:props.nowPage==='setting'?iconActiveColor:iconColor}}></SettingsIcon>
+					<p className="label">{{kr: '설정', en: 'Setting', jp: '設定'}[lang]}</p>
 				</div>
+				
 			</div>
-
-
 			<Player></Player>
 		</div>
 	)

@@ -1,34 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { connect } from 'react-redux'
-import { useParams, Route,useHistory, useLocation, Link } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 
-import MusicNoteIcon from '@material-ui/icons/MusicNote';
-import QueueMusicIcon from '@material-ui/icons/QueueMusic';
-import SearchIcon from '@material-ui/icons/Search';
-import SettingsIcon from '@material-ui/icons/Settings';
-import Brightness6Icon from '@material-ui/icons/Brightness6';
 import LanguageIcon from '@material-ui/icons/Language';
 import PersonIcon from '@material-ui/icons/Person';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
+import NightsStayIcon from '@material-ui/icons/NightsStay';
+import SyncIcon from '@material-ui/icons/Sync';
+import SyncDisabledIcon from '@material-ui/icons/SyncDisabled';
 
 import { Switch } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
 
-import Player from './Player.js';
-
 function Popup(props) {
 	const { lang, page } = useParams();
 	const history = useHistory();
-	const location = useLocation();
 	
 	const [isPopupActiveded, setPopupActiveded] = useState(false);
 	
 	const iconColor = '#777777';
 	
 	// useEffect(()=>{
-	// 	if(lang)
-	// 		props.dispatch({type:'setLang', payload:lang});
-	// }, [lang]);
+	// 	setPopupActiveded(false);
+	// }, [location]);
 	
 	return (
 		<div className={`popup ${props.isPlayerActive&&'inactive'}`}>
@@ -45,7 +39,10 @@ function Popup(props) {
 				<div className='alignCenter langLabel'><LanguageIcon></LanguageIcon></div>
 				<div className='alignCenter langSetting'>
 					<ToggleButtonGroup size='small' exclusive={true} value={lang} onChange={(event, value)=>{
-						if(value) history.push(`/${value}/${page}`);
+						if(value) {
+							history.replace(`/${value}/${page}`);
+							//props.dispatch({type:'langChanged'});
+						}
 					}}>
 						<ToggleButton value='kr'>한국어</ToggleButton>
 						<ToggleButton value='en'>&nbsp;ENG&nbsp;</ToggleButton>
@@ -53,10 +50,17 @@ function Popup(props) {
 					</ToggleButtonGroup>
 				</div>
 				
-				<div className='alignCenter themeLabel'><Brightness6Icon></Brightness6Icon></div>
+				<div className='alignCenter themeLabel'>{props.theme==='light'?<WbSunnyIcon></WbSunnyIcon>:<NightsStayIcon></NightsStayIcon>}</div>
 				<div className='alignCenter themeSetting'>
 					<Switch color='primary' checked={props.theme==='light'} onChange={(event)=>{
-					event.target.checked?props.dispatch({type:'lightTheme'}):props.dispatch({type:'darkTheme'});		
+						event.target.checked?props.dispatch({type:'lightTheme'}):props.dispatch({type:'darkTheme'});		
+					}}></Switch>
+				</div>
+				
+				<div className='alignCenter animLabel'>{props.anim==='off'?<SyncDisabledIcon></SyncDisabledIcon>:<SyncIcon></SyncIcon>}</div>
+				<div className='alignCenter animSetting'>
+					<Switch color='primary' checked={props.anim==='on'} onChange={(event)=>{
+						event.target.checked?props.dispatch({type:'animOn'}):props.dispatch({type:'animOff'});		
 					}}></Switch>
 				</div>
 				
@@ -73,7 +77,8 @@ function stateToProps(state) {
         playerReducer : state.playerReducer,
 				lang: state.langReducer,
 				nowPage: state.pageReducer,
-				theme: state.themeReducer
+				theme: state.themeReducer,
+				anim: state.animReducer
     }
 }
 
