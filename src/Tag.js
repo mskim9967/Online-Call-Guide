@@ -3,9 +3,9 @@ import { connect } from 'react-redux'
 
 function Tag(props) {
 	return (
-		<div className="tag" style={{backgroundImage: `linear-gradient(110deg, `+props.color1+`, 30%,`+props.color2+`)`}}>
+		<div className="tag" style={{backgroundImage: `linear-gradient(110deg, `+props.color1+`, 50%,`+props.color2+`)`}}>
 			<div className='image alignCenter'>
-				<img src={"/api/img/"+props.classify+"/"+props.id}></img>
+				<img style={{padding: `${props.padding}px`}} src={"/api/img/"+props.classify+"/"+props.id}></img>
 			</div>
 			<div className='name'>
 				{props.name}

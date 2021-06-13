@@ -44,7 +44,7 @@ function SongCard(props) {
 			document.removeEventListener("touchend", handleClick);
 		}
 	}, [props.song]);
-
+ 
 	if(!props.song) return (null);
 
 	return (
@@ -65,19 +65,19 @@ function SongCard(props) {
 
 			<div className='tagsArea' ref={ref}>
 				{
-					(props.song.song_type!==1) ?
+					(props.song.song_type===0 || props.song.song_type===2) ?
 						tagData.map((idolCV, idx)=>{
 							return (
 								<>
-									<Tag key={idx*2} classify='idol' id={idolCV.idol_id} name={eval('idolCV.idol_name_'+lang)} color1={idolCV.idol_color} color2={adjust(idolCV.idol_color, 90)}></Tag>
-									<Tag key={idx*2+1} classify='cv' id={idolCV.cv_id} name={eval('idolCV.cv_name_'+lang)} color1={idolCV.idol_color} color2={adjust(idolCV.idol_color, 90)}></Tag>
+									<Tag key={idx*2} classify='idol' id={idolCV.idol_id} name={eval('idolCV.idol_name_'+lang)} color1={adjust(idolCV.idol_color, 120)} color2={adjust(idolCV.idol_color, 20)}></Tag>
+									<Tag key={idx*2+1} classify='cv' id={idolCV.cv_id} name={eval('idolCV.cv_name_'+lang)} color1={adjust(idolCV.idol_color, 120)} color2={adjust(idolCV.idol_color, 20)}></Tag>
 								</>
 							)
 						})
 					:
 						tagData.map((unit, idx)=>{
 							return (
-									<Tag key={idx*2} classify='unit' id={unit.unit_id} name={eval('unit.unit_name_'+lang)||unit.unit_name_en} color1={unit.unit_color} color2={adjust(unit.unit_color, 90)}></Tag>
+									<Tag key={idx*2} classify='unit' id={unit.unit_id} name={eval('unit.unit_name_'+lang)||unit.unit_name_en} color1={adjust(unit.unit_color, 120)} color2={adjust(unit.unit_color, 20)}></Tag>
 							)
 						})
 				}
@@ -97,6 +97,15 @@ function hex_setSat(H, sat) { // Convert hex to RGB first
 	let r = 0, g = 0, b = 0; if (H.length === 4) { r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3]; } else if (H.length === 7) { r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6]; } // Then to HSL 
 	let v=Math.max(r,g,b), c=v-Math.min(r,g,b); let h= c && ((v===r) ? (g-b)/c : ((v===g) ? 2+(b-r)/c : 4+(r-g)/c)); h=60*(h<0?h+6:h); let s=sat;
 	let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0); return `rgb(${f(5)},${f(3)},${f(1)})`; 
+}
+
+function hex_setHue(H, hue) { // Convert hex to RGB first 
+	let r = 0, g = 0, b = 0; if (H.length === 4) { r = "0x" + H[1] + H[1]; g = "0x" + H[2] + H[2]; b = "0x" + H[3] + H[3]; } else if (H.length === 7) { r = "0x" + H[1] + H[2]; g = "0x" + H[3] + H[4]; b = "0x" + H[5] + H[6]; } // Then to HSL 
+	let v=Math.max(r,g,b), c=v-Math.min(r,g,b);
+  let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+  h=60*(h<0?h+6:h) + hue;let s=v&&c/v; 
+	let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);     
+  return `rgb(${f(5)},${f(3)},${f(1)})`;       
 }
 
 function stateToProps(state) {

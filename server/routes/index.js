@@ -30,8 +30,8 @@ router.get('/song_idol_cv/search', (req, res) => {
   });
 });
 
-router.get('/song_unit_idol_cv/search', (req, res) => {
-	var sql = 'SELECT * FROM SONG_UNIT NATURAL JOIN SONG NATURAL JOIN UNIT NATURAL JOIN UNIT_IDOL NATURAL JOIN IDOL NATURAL JOIN CV';
+router.get('/song_unit_idol_cv_view/search', (req, res) => {
+	var sql = 'SELECT * FROM SONG_UNIT_IDOL_CV_VIEW';
 	
 	if(Object.keys(req.query).length !== 0) {
 		sql += ' WHERE';

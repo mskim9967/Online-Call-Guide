@@ -77,10 +77,10 @@ function SongCardList(props) {
 			setSongsInputFilter([...temp]);
 		}
 		else if(orderSt===1 && order===0) {
-			setSongsInputFilter([...temp.sort((a,b)=>{return eval('a.song_title_'+lang+'.toUpperCase()')>eval('b.song_title_'+lang+'.toUpperCase()')?1:-1})]);
+			setSongsInputFilter([...temp.sort((a,b)=>{return (eval('a.song_title_'+lang)?eval('a.song_title_'+lang+'.toUpperCase()'):a.song_title_en.toUpperCase())>(eval('b.song_title_'+lang)?eval('b.song_title_'+lang+'.toUpperCase()'):b.song_title_en.toUpperCase())?1:-1})]);
 		}
 		else if(orderSt===1 && order===1) {
-			setSongsInputFilter([...temp.sort((a,b)=>{return eval('a.song_title_'+lang+'.toUpperCase()')>eval('b.song_title_'+lang+'.toUpperCase()')?-1:1})]);
+			setSongsInputFilter([...temp.sort((a,b)=>{return (eval('a.song_title_'+lang)?eval('a.song_title_'+lang+'.toUpperCase()'):a.song_title_en.toUpperCase())<(eval('b.song_title_'+lang)?eval('b.song_title_'+lang+'.toUpperCase()'):b.song_title_en.toUpperCase())?1:-1})]);
 		}
 		else if(orderSt===2 && order===0) {
 			setSongsInputFilter([...temp.sort((a,b)=>{return (a.album_release_date>b.album_release_date)?1:-1})]);
@@ -100,7 +100,7 @@ function SongCardList(props) {
 		return axios.get(`/api/song_idol_cv/search?idol_name_kr=${val}&idol_name_jp=${val}&idol_name_en=${val}&cv_name_kr=${val}&cv_name_jp=${val}&cv_name_en=${val}`);				 
 	}
 	function getSongUnit(val){
-		return axios.get(`/api/song_unit_idol_cv/search?idol_name_kr=${val}&idol_name_jp=${val}&idol_name_en=${val}&cv_name_kr=${val}&cv_name_jp=${val}&cv_name_en=${val}&unit_name_kr=${val}&unit_name_jp=${val}&unit_name_en=${val}`);
+		return axios.get(`/api/song_unit_idol_cv_view/search?idol_name_kr=${val}&idol_name_jp=${val}&idol_name_en=${val}&cv_name_kr=${val}&cv_name_jp=${val}&cv_name_en=${val}&unit_name_kr=${val}&unit_name_jp=${val}&unit_name_en=${val}`);
 	}
 	return (
 		<>
@@ -117,7 +117,7 @@ function SongCardList(props) {
 											temp.splice(i+1, 1, !temp[i+1]);
 											setProductionChecked([...temp]);
 										}}>
-										<Tag key={i} classify='production' id={production.production_id} name={eval('production.series_short_'+lang)} color1={adjust(production.production_color, 120)} color2={adjust(production.production_color, 40)}></Tag>
+										<Tag key={i} classify='production' id={production.production_id} name={eval('production.series_short_'+lang)} color1={adjust(production.production_color, 200)} color2={adjust(production.production_color, 80)} padding={{1:2,2:2.5,4:3}[i]}></Tag>
 								</div>)
 							})
 						}</div>
@@ -134,7 +134,7 @@ function SongCardList(props) {
 											temp.splice(i, 1, !temp[i]);
 											setSongAttrChecked([...temp]);
 										}}>
-										<Tag key={i} classify='songAttr' id={i} name={{kr:{0:'솔로',1:'유닛',2:'다인',3:'단체'}[i], en:{0:'Solo',1:'Unit',2:'Multi',3:'ALL'}[i], jp:{0:'ソロ',1:'ユニット',2:'茶人',3:'単体'}[i]}[lang]} color1={{0:'#FF0000',1:'#00FF00',2:'#0000FF',3:'#F0F0F0'}[i]} color2={{0:'#FF0000',1:'#00FF00',2:'#0000FF',3:'#F0F0F0'}[i]}></Tag>
+										<Tag key={i} classify='songAttr' id={i} name={{kr:{0:'솔로',1:'유닛',2:'다인',3:'단체'}[i], en:{0:'Solo',1:'Unit',2:'Multi',3:'ALL'}[i], jp:{0:'ソロ',1:'ユニット',2:'茶人',3:'単体'}[i]}[lang]} color1={{0:'#c7ff99',1:'#99fdff',2:'#da99ff',3:'#ffa53d'}[i]} color2={{0:'#99fff0',1:'#bd99ff',2:'#ff99ac',3:'#dfff3d'}[i]} padding={{0:6,1:5,2:5,3:2}[i]}></Tag>
 								</div>)
 							})
 						}</div>
@@ -152,7 +152,7 @@ function SongCardList(props) {
 											temp.splice(i, 1, !temp[i]);
 											setLevelChecked([...temp]);
 										}}>
-										<Tag key={i} classify='songAttr' id={i} name={{kr:{0:'쉬움',1:'보통',2:'어려움'}[i], en:{0:'Easy',1:'Normal',2:'Hard'}[i], jp:{0:'安直',1:'普通',2:'普通'}[i]}[lang]} color1={{0:'#FF0000',1:'#00FF00',2:'#0000FF'}[i]} color2={{0:'#FF0000',1:'#00FF00',2:'#0000FF'}[i]}></Tag>
+										<Tag key={i} classify='level' id={i} name={{kr:{0:'쉬움',1:'보통',2:'어려움'}[i], en:{0:'Easy',1:'Normal',2:'Hard'}[i], jp:{0:'安直',1:'普通',2:'普通'}[i]}[lang]} color1={{0:'#24e2ff',1:'#f8ff26',2:'#f57d05'}[i]} color2={{0:'#6b7aff',1:'#8dff5c',2:'#ff3d3d'}[i]} padding={4}></Tag>
 								</div>)
 							})
 						}</div>

@@ -44,7 +44,7 @@ function PlaylistTab(props) {
 				props.playlists?.map((playlist, i)=>{
 					return (<div className={`playlistCard`} onClick={()=>{
 						activatedCardModal!==i ? setActivatedCardModal(i):setActivatedCardModal(null);
-					}} style={{backgroundImage:`url(/api/img/album/${playlist.data[0].song_id})`, backgroundRepeat:'no-repeat', backgroundSize: 'cover',backgroundPosition:'center center'}}>
+					}} style={{backgroundImage:`url(/api/img/album/${playlist.data[0].album_id})`, backgroundRepeat:'no-repeat', backgroundSize: 'cover',backgroundPosition:'center center'}}>
 						<div className={`cardModal alignCenter ${i!==activatedCardModal&&'inactive'}`}> 
 							<div className={`edit`}><EditIcon style={{fontSize: 25, color:'#ffffff'}}></EditIcon></div>
 							<div className={`play`} onClick={()=>props.dispatch({type:'playlistReload',payload:{playlistNum: i}})}><PlayArrowIcon style={{fontSize: 45, color:'#ffffff'}}></PlayArrowIcon></div>

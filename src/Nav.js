@@ -9,7 +9,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import SettingsIcon from '@material-ui/icons/Settings';
 
 import Player from './Player.js';
-
+ 
 function Nav(props) {
 	const { lang  } = useParams();
 	const history = useHistory();

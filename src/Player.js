@@ -47,12 +47,14 @@ function Player(props) {
 	
 	const [playlist, setPlaylist] = useState([]);
 	const [nowPlay, setNowPlay] = useState(-1);
+	const [delay, setDelay] = useState(0.0);
 	const [isPlaylistModalActive, setPlaylistModalActive] = useState(false);
 	const [isSecondActive, setSecondActive] = useState(null);
 	const [loadData, loadDataTrigger] = useState(false);	
 	
 	const pageRef = useRef(null);
 	const inputRef = useRef(null);
+	const progressBarAreaRef = useRef(null);
 	
 	const { search } = useLocation()
 	const { song_id } = queryString.parse(search);
@@ -61,7 +63,9 @@ function Player(props) {
 	const [showLyricLex, setShowLyricLex] = useState(true);
 	const [showCallLex, setShowCallLex] = useState(true);
 	
+	const [fanlightColor,setFanlightColor] = useState('#ffffff');
 	const [lyricCallData, setLyricCallData] = useState([]);
+	const [highlight, setHighlight] = useState(false);
 	const [beat, setBeat] = useState(0);
 	const [activeBlock, setActiveBlock] = useState(0);
 	const [audioProgress, setAudioProgress] = useState(0);
@@ -77,13 +81,19 @@ function Player(props) {
 					if(pageRef.current.scrollTop===0) history.replace(`${location.pathname}`);
 			},
 	});
+	const playlistHandlers = useSwipeable({
+			onSwipeStart: (eventData) => {
+				if(eventData.dir==='Down') 
+					history.replace(`${location.pathname}`);
+			},
+	});
 	const [cp, setCp] = useState(0);
 	const audioHandlers = useSwipeable({
 		onSwipeStart: (e)=>{pause();setCp(audioProgress);},
 		onSwiping: (e)=>{setAudioProgress(cp+e.deltaX/6)},
-		onSwiped: (e)=>{audio.currentTime=audioProgress/100*audio.duration;play()}
+		onSwiped: (e)=>{if(audio.currentTime) audio.currentTime=audioProgress/100*audio.duration; setHighlight(false); play()}
 	});
-	var buttonColor= '#eeeeee', themeColor='#ffffff', fanlightColor='#ffffff';	
+	var buttonColor= '#eeeeee', themeColor='#ffffff';
 	var modalTimer, focusTimerID;
 	
 	function play(){
@@ -99,6 +109,16 @@ function Player(props) {
 	useEffect(()=>{
 		return ()=>{clearTimeout(modalTimer);clearTimeout(focusTimerID);}
 	},[]);
+
+	useEffect(()=>{
+		document.documentElement.style.setProperty("--flc", highlight?'#ffa000':fanlightColor);
+	},[highlight]);
+	
+	useEffect(()=>{
+		document.documentElement.style.setProperty("--flc", fanlightColor);
+		themeColor=hex_setSat(fanlightColor, 0.13);
+		document.documentElement.style.setProperty("--tc", themeColor);
+	},[fanlightColor]);
 	
 	useEffect(()=>{
 		if(!song_id || !isPlaylistModalActive) {
@@ -120,15 +140,16 @@ function Player(props) {
 		window.localStorage.setItem("playlists", JSON.stringify(props.playlists));
 	},[props.playlists]);
 	
+	
 	useEffect(()=>{
 		let timerID, timer2ID;
-		if(!isAudioPaused) {
+		if(!isAudioPaused && props.isPlayerActive) {
 			timerID = setInterval(()=>{
-				setBeat(parseInt(audio.currentTime*1000/beatLen));
-			},80);
+				setBeat(Math.floor((audio.currentTime*1000+delay)/beatLen));
+			},130);
 			timer2ID = setInterval(()=>{
 				setAudioProgress(parseFloat(audio.currentTime*1000)/(audio.duration*1000)*100);
-			},500);
+			},1000);
 		}
 		else {
 			clearInterval(timerID);
@@ -138,10 +159,10 @@ function Player(props) {
 			clearInterval(timerID);
 			clearInterval(timer2ID);
 		}											
-	},[isAudioPaused]);
+	},[isAudioPaused, props.isPlayerActive]);
 
 	useEffect(()=>{
-		let temp = new Array(1300).fill([]);
+		let temp = new Array(2000).fill([]);
 		lyricCallData.map((block)=>{
 			block.lyricLex?.map((lyric)=>{
 				for(let i = 0; i < lyric.beats; i++)
@@ -152,14 +173,16 @@ function Player(props) {
 	},[lyricCallData]);
 	
 	useEffect(()=>{
-		setActiveBlock(lyricCallData.findIndex(e=>e.lineStartBeat>beat)-1);
+		setActiveBlock(lyricCallData.findIndex(e=>e.lineStartBeat>beat+2)-1);
+		if(lyricCallData[activeBlock]?.highlightStart === beat) setHighlight(true);
+		if(lyricCallData[activeBlock]?.highlightEnd === beat) setHighlight(false);
 	}, [beat]);
 
 	useEffect(()=>{
 		if(scrollLock)
-			document.querySelector('.block.active')?.scrollIntoView({behavior:'smooth', block:'center'});
+			document.querySelector('.block.active')?.scrollIntoView({ behavior:'smooth', block:'center'});
 		// scroller.scrollTo('ele'+activeBlock, {
-		// 	duration:1000,
+		// 	duration:1000, 
 		// 	smooth: true
 		// });
 		// scroll.scrollToBottom();
@@ -201,7 +224,7 @@ function Player(props) {
 		var isPause = audio.paused;
 		if(nowPlay!==-1)			
 			axios.all([getSongData(playlist[nowPlay].song_id), getLyricCallData(playlist[nowPlay].song_id)]).then(axios.spread((res1, res2)=>{
-				if(pageRef.current) pageRef.current.scrollTop=0;
+				setHighlight(false);
 				setBeat(0);
 				setActiveBlock(0);
 				setAudioProgress(0);
@@ -212,13 +235,11 @@ function Player(props) {
 				if(playlist[nowPlay].needUpdate) setPlaylist([...playlist.slice(0, playlist.length-1), res1.data.rows[0]]);
 				setSongData(res1.data.rows);
 				setBeatLen(60000.0 / res1.data.rows[0].song_bpm);
+				if(res1.data.rows[0].song_delay !== null) setDelay(res1.data.rows[0].song_delay);
 				
-				if(res1.data.rows[0].song_color_type === 0) fanlightColor = res1.data.rows[0].idol_shown_color;
-				else if(res1.data.rows[0].song_color_type === 1) fanlightColor = res1.data.rows[0].unit_shown_color;
-				else if(res1.data.rows[0].song_color_type === 2) fanlightColor = res1.data.rows[0].song_fixed_color;
-				document.documentElement.style.setProperty("--flc", fanlightColor);	 
-				themeColor=hex_setSat(fanlightColor, 0.13);
-				document.documentElement.style.setProperty("--tc", themeColor);
+				if(res1.data.rows[0].song_color_type === 0) setFanlightColor(res1.data.rows[0].idol_shown_color);
+				else if(res1.data.rows[0].song_color_type === 1) setFanlightColor(res1.data.rows[0].unit_shown_color);
+				else if(res1.data.rows[0].song_color_type === 2) setFanlightColor(res1.data.rows[0].song_fixed_color);
 				
 				props.playerReducer.pass=true;
 				history.replace(`${location.pathname}?song_id=${res1.data.rows[0].song_id}`);
@@ -269,6 +290,12 @@ function Player(props) {
 			 }) 
 			.catch(()=>{});
 	},[lang]);
+	
+	function LyricCall() {
+		return (<>{
+			
+		}</>)
+	}
 	
 	return (
 		<>
@@ -335,9 +362,9 @@ function Player(props) {
 
 		
 		{songData.length&&<>		
-		<div className={"playerPage " + (props.isPlayerActive ? "active" : "")} >
+		<div className={`playerPage ${props.isPlayerActive && "active"}`}>
 			{
-				<div className={`infoArea ${(!songData[0].song_is_unit.data[0]&&songData.length===1)&&'inactive'}`}>{
+				<div className={`infoArea ${(songData.length===1)&&'inactive'}`}>{
 					songData.map((idol, i)=>{
 						return(
 							<div className={`idolImgArea ${(part[beat]&&((part[beat][0]===9)||(part[beat].includes(i+1))))?'active':''}`}
@@ -349,7 +376,7 @@ function Player(props) {
 				)}</div>
 			}
 
-		<div className="callGuideArea" {...handlers}>
+		<div className={`callGuideArea ${highlight ? "highlight":"highlightEnd"}`} {...handlers}>
 			<div className={`lyricArea ${isPlaylistActive&&'inactive'}`} >
 				<div className='iconsArea'>
 					<div className='scrollLockIconArea'>{
@@ -387,12 +414,12 @@ function Player(props) {
 										{block.lyricMean&&<div className={`lyricMeanLine ${(idx===activeBlock)&&'active'} ${!showLyricMean&&'disable'} ${!showLyricLex&&'moveTop'}`}> <span className='lyricMean'>{block.lyricMean}</span></div>}
 										{
 											block.lyricLex&&<div className={`lyricLexLine ${!showLyricLex&&'disable'}`}>{ block.lyricLex?.map((lyric, id)=>{
-												return( <span className={`lyricLex ${lyric.start<=beat&&lyric.start+lyric.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=lyric.start*beatLen/1000.0;}}>{lyric.text}</span>)
+												return( <span className={`lyricLex ${lyric.start<=beat&&lyric.start+lyric.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=lyric.start*beatLen/1000.0; setHighlight(false);}}>{lyric.text}</span>)
 											})}</div>
 										}
 										{
 											block.callLex&&<div className={`callLexLine ${!showCallLex&&'disable'}`}>{block.callLex?.map((call, id)=>{
-												return( <span className={`call ${call.start<=beat&&call.start+call.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=call.start*beatLen/1000.0;}}>{call.text}</span>)
+												return( <span className={`call ${call.start<=beat&&call.start+call.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=call.start*beatLen/1000.0; setHighlight(false);}}>{call.text}</span>)
 											})}</div>
 										}
 										{
@@ -410,11 +437,12 @@ function Player(props) {
 								kr: '가사가 아직 등록되지 않았어요ㅜ',
 								en: 'Lyric is not uploaded yet :(',
 								jp: '歌詞がまだ登録されていません :('
-							}[lang]}</div>
+							}[lang]
 						}</div>
+					}</div>
 				</div>
 				
-				<div className={`playlistArea ${!isPlaylistActive&&'inactive'}`}>
+				<div className={`playlistArea ${!isPlaylistActive&&'inactive'}`} {...playlistHandlers} >
 					
 					<div className='iconsArea'>
 					<div className='shuffleIconArea'>{
@@ -499,7 +527,7 @@ function Player(props) {
 					</div>
 				</div>
 			
-				<div className={`closeIconArea ${(!songData[0].song_is_unit.data[0] && songData.length===1)&&'solo'}`}><ExpandMoreIcon style={{fontSize: 30, color:buttonColor}} onClick={()=>{ history.replace(`${location.pathname}`);}}></ExpandMoreIcon></div>
+				<div className={`closeIconArea ${(songData[0].song_type===0)&&'solo'}`}><ExpandMoreIcon style={{fontSize: 30, color:buttonColor}} onClick={()=>{ history.replace(`${location.pathname}`);}}></ExpandMoreIcon></div>
 				
 				<div className='pageChangeIconArea'>{
 					isPlaylistActive?	
@@ -513,7 +541,8 @@ function Player(props) {
 			</div>
 			
 			<div className='playerArea'  {...audioHandlers}>
-				<div className='progressBarArea'>
+				<div className='progressBarArea' ref={progressBarAreaRef} onClick={(e)=>{console.log(progressBarAreaRef.current.offsetWidth+" " +e.clientX); setAudioProgress(e.clientX/progressBarAreaRef.current.offsetWidth*100);
+audio.currentTime=e.clientX/progressBarAreaRef.current.offsetWidth*audio.duration; setHighlight(false); play()}}>
 					<div className='progressBar' style={{width: audioProgress+'%'}}></div>
 				</div>
 				
@@ -522,7 +551,7 @@ function Player(props) {
 				<div className='titleArea'><span>{(eval('songData[0].song_title_'+lang)||songData[0].song_title_en)}</span></div>
 				
 				<div className='artistArea'>{
-					songData[0].song_is_unit.data[0] ?
+					(songData[0].song_type===1 || songData[0].song_type===3) ?
 						<span>{(eval('songData[0].unit_name_'+lang)||songData[0].unit_name_en)}</span>
 					:		
 						songData.map((idolCV, i)=>{
