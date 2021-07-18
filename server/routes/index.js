@@ -8,9 +8,6 @@ var parser = require('../lyricCallParser')
 
 dbConn.ocg_open(connection);
 
-
-
-
 router.get('/song_idol_cv/search', (req, res) => {
 	var sql = 'SELECT * FROM SONG_IDOL NATURAL JOIN CV NATURAL JOIN IDOL NATURAL JOIN SONG';
 	
@@ -94,8 +91,7 @@ router.get('/:table/search', (req, res) => {
 });
 
 router.get('/:table', (req, res) => {
-
-		var sql = 'SELECT * FROM ' + req.params.table.toUpperCase();
+	var sql = 'SELECT * FROM ' + req.params.table.toUpperCase();
 	
 	if(Object.keys(req.query).length !== 0) {
 		sql += ' WHERE';
@@ -114,7 +110,6 @@ router.get('/:table', (req, res) => {
 	});
 });
 
-
 router.get('/img/:table/:id', (req, res) => {
 	if(req.params.id !== 'undefined')	res.sendFile(req.params.id+'.webp', { root: __dirname+'/../img/'+req.params.table});
 });
@@ -126,4 +121,5 @@ router.get('/audio/:id', (req, res) => {
 router.get('/lyric_call/:lang/:id', (req, res) => {
 	res.json(parser.parse(`${__dirname}/../lyric_call/${req.params.lang}/${req.params.id}`));  
 });
+
 module.exports = router;

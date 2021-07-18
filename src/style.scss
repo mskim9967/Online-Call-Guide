@@ -138,7 +138,7 @@ body {
 	.bg.inactive {
 		
 		display: relative;
-		opacity: 0%;
+		opacity: 0.0;
 		transition: opacity $timeB, max-height 0s $timeB;
 		max-height: 0px;
 		
@@ -153,7 +153,7 @@ body {
 		background-color: #000000;
 		
 		position: fixed;
-		opacity:70%;
+		opacity:0.7;
 		transition: opacity $timeC, max-height 0s;
 
 		max-height: 100%;
@@ -269,7 +269,7 @@ body {
 	
 	.playlistModal {
 		&.inactive {
-			opacity: 0%;
+			opacity: 0;
 			transition: opacity $timeC, max-height 0s $timeC;
 			max-height: 0px;
 			.modalArea{
@@ -373,7 +373,7 @@ body {
 		
 		.bg {
 			&.inactive {
-				opacity: 0%;
+				opacity: 0;
 				transition: opacity $timeC, max-height 0s $timeC;
 				max-height: 0px;
 			}
@@ -383,7 +383,7 @@ body {
 			bottom: 0;
 			left: 0;
 			background-color: #000000;
-			opacity:40%;
+			opacity:0.4;
 			transition: opacity $timeC, max-height 0s;
 			max-height: 100%;
 		}
@@ -446,7 +446,7 @@ body {
 					box-shadow:none;
 				}
 				img{
-					opacity: 100%;
+					opacity: 1;
 				}
 			}
 			.idolImgArea {
@@ -455,16 +455,16 @@ body {
 				border-radius: 50%;
 				overflow:hidden;
 				box-shadow: none;
-				//transition: box-shadow $timeA;
+				transition: box-shadow $timeB;
 				.shadow {
 					height:100%;
 					border-radius: 50%;
 					box-shadow: inset 0 0 10px 2px #111111;			
-					//transition: box-shadow $timeA;	
+					transition: box-shadow $timeB;	
 				}
 				img{
-					opacity: 50%;
-					//transition: opacity $timeA;
+					opacity: 0.5;
+					transition: opacity $timeB;
 					position: relative;
 					z-index: -1;
 					max-width: 100%;
@@ -483,7 +483,7 @@ body {
 				background-color: #0a0a0a;
 				transition: background-color 1s;
 				.lyricLex:not(.active), .call:not(.active){
-					opacity: 18% !important;
+					opacity: 0.18 !important;
 					transition: opacity 1s, color 1s;
 					color: #ffffff;
 				}
@@ -568,7 +568,7 @@ body {
 						.lyricMeanLine {
 							&.active {
 								transition: opacity $timeC;
-								opacity:100%;
+								opacity:1;
 							}
 							&.disable{
 								font-size:0rem;
@@ -580,7 +580,7 @@ body {
 							}
 							transition: font-size $timeC, margin-bottom $timeC, opacity $timeL; 
 							font-size: 0.6rem;
-							opacity:40%;
+							opacity:0.4;
 							font-style: italic;
 							font-weight:300;
 							margin-bottom:-4px;
@@ -595,13 +595,13 @@ body {
 							.lyricLex{
 								&.active {
 									transition: opacity 0s, text-shadow 0s;
-									opacity:100%;
+									opacity:1;
 									text-shadow: 0 0 2px $flc;
 									transition: -webkit-text-stroke $timeL;	
 								}
 								font-weight: 400;
 								transition: opacity $timeL, text-shadow $timeL;	
-								opacity:40%;
+								opacity:0.4;
 							}
 						}
 						.callLexLine {
@@ -615,13 +615,13 @@ body {
 							.call{
 								&.active {
 									transition: opacity 0s, text-shadow 0s;
-									opacity:100%;
+									opacity:1;
 									-webkit-text-stroke: 0.7px $flc;
 									text-shadow: 0 0 4px $flc;
 									transition: -webkit-text-stroke 0;	
 								}
 								transition: opacity $timeL, text-shadow $timeL;	
-								opacity:40%;
+								opacity:0.4;
 							}
 						}
 						
@@ -942,7 +942,7 @@ body {
 							.tagCtrl{
 								&.inactive{
 									.tag .name {
-										opacity:40%;
+										opacity:0.4;
 									}
 									filter: grayscale(90%) brightness(70%); 
 									transition: filter $timeB, opacity $timeB;
@@ -1037,7 +1037,7 @@ body {
 					
 				}
 				.behind.loaded{
-					opacity:100%;
+					opacity:1;
 					transition: opacity 0s 0.7s;
 					position: absolute;
 					right:20px;
@@ -1203,7 +1203,7 @@ body {
 					.cardModal {
 						justify-content: space-evenly;
 						&.inactive {
-							opacity:0%;
+							opacity:0;
 							max-height:0;
 							transition: opacity $timeB, max-height 0s $timeB;
 						}
@@ -1213,7 +1213,7 @@ body {
 						z-index:1;
 						width:100%;
 						height:100%;
-						opacity:100%;
+						opacity:1;
 						background-color: rgba(0,0,0,0.6);
 					}
 					.textArea {

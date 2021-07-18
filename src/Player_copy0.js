@@ -56,6 +56,13 @@ function Player(props) {
 	const inputRef = useRef(null);
 	const progressBarAreaRef = useRef(null);
 	
+	const lyricRef = useRef([]);
+	const [latestLyricRef, setLatestLyricRef] = useState(null);
+	const callRef = useRef([]);
+	const [latestCallRef, setLatestCallRef] = useState(null);
+	const behaviorRef = useRef([]);
+	const [latestBehaviorRef, setLatestBehaviorRef] = useState(null);
+	
 	const { search } = useLocation()
 	const { song_id } = queryString.parse(search);
 	
@@ -125,6 +132,10 @@ function Player(props) {
 			setPlaylistModalActive(false);
 			setSecondActive(null);
 			inputRef.current.value='';
+			
+			//for(let i = 1; i < lyricRef.current.length; i++)
+				//if(!lyricRef.current[i]) lyricRef.current[i] = lyricRef.current[i - 1]; 
+
 	 	}
 	},[song_id, isPlaylistModalActive]);
 	
@@ -174,8 +185,23 @@ function Player(props) {
 	
 	useEffect(()=>{
 		setActiveBlock(lyricCallData.findIndex(e=>e.lineStartBeat>beat+2)-1);
+		if(lyricCallData[activeBlock]?.highlightStart === beat) setHighlight(true);
 		if(lyricCallData[activeBlock]?.highlightEnd === beat) setHighlight(false);
-		else if(lyricCallData[activeBlock]?.highlightStart === beat) setHighlight(true);
+
+			latestLyricRef?.classList.remove('active');
+			setLatestLyricRef(lyricRef.current[beat]);	
+			lyricRef.current[beat]?.classList.add('active');
+
+
+			latestCallRef?.classList.remove('active');
+			setLatestCallRef(callRef.current[beat]);	
+			callRef.current[beat]?.classList.add('active');
+			
+	
+			latestBehaviorRef?.classList.remove('active');
+			setLatestBehaviorRef(behaviorRef.current[beat]);	
+			behaviorRef.current[beat]?.classList.add('active');
+		
 	}, [beat]);
 
 	useEffect(()=>{
@@ -414,17 +440,17 @@ function Player(props) {
 										{block.lyricMean&&<div className={`lyricMeanLine ${(idx===activeBlock)&&'active'} ${!showLyricMean&&'disable'} ${!showLyricLex&&'moveTop'}`}> <span className='lyricMean'>{block.lyricMean}</span></div>}
 										{
 											block.lyricLex&&<div className={`lyricLexLine ${!showLyricLex&&'disable'}`}>{ block.lyricLex?.map((lyric, id)=>{
-												return( <span className={`lyricLex ${lyric.start<=beat&&lyric.start+lyric.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=lyric.start*beatLen/1000.0; setHighlight(false);}}>{lyric.text}</span>)
+												return( <span className='lyricLex' ref={e=>{for(let i=0;i<lyric.beats;i++)lyricRef.current[lyric.start+i]=e}} onClick={()=>{audio.currentTime=lyric.start*beatLen/1000.0; setHighlight(false);}}>{lyric.text}</span>)
 											})}</div>
 										}
 										{
 											block.callLex&&<div className={`callLexLine ${!showCallLex&&'disable'}`}>{block.callLex?.map((call, id)=>{
-												return( <span className={`call ${call.start<=beat&&call.start+call.beats>beat&&'active'}`} onClick={()=>{audio.currentTime=call.start*beatLen/1000.0; setHighlight(false);}}>{call.text}</span>)
+												return( <span className='call' ref={e=>{for(let i=0;i<call.beats;i++)callRef.current[call.start+i]=e}} onClick={()=>{audio.currentTime=call.start*beatLen/1000.0; setHighlight(false);}}>{call.text}</span>)
 											})}</div>
 										}
 										{
-											block.behavior&&<div className='lyricLexLine'>{block.behavior?.map((behavior, id)=>{
-												return( <span className={`behavior ${behavior.start<=beat&&behavior.start+behavior.beats>beat&&'active'}`}>{behavior.text}</span>)
+											block.behavior&&<div className='behaviorLine' >{block.behavior?.map((behavior, id)=>{
+												return( <span className='behavior' ref={e=>{for(let i=0;i<behavior.beats;i++)behaviorRef.current[behavior.start+i]=e}}>{behavior.text}</span>)
 											})}</div>
 										}
 									</Element>
