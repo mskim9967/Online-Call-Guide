@@ -1,1 +1,1 @@
-www.imascg.com:3002
+http://imascg.com:3002
